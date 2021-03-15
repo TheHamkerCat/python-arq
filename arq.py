@@ -55,6 +55,9 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].url
+                        
+                        result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
+                        
         '''
 
         results = DotMap()
@@ -78,6 +81,8 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].magnet
+                        
+                        result[result_number].name | .uploaded | .size | .seeds | .leechs | .magnet
         '''
 
         results = DotMap()
@@ -100,6 +105,8 @@ class arq:
                         query (str): Query to search
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].title
+
+                        result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         '''
 
         results = DotMap()
@@ -123,6 +130,8 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         '''
 
         results = DotMap()
@@ -146,6 +155,8 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].url_image
+
+                        result[result_number].id | .width | .height | .file_type | .file_size | .url_image | .url_thumb | .url_page
         '''
 
         results = DotMap()
@@ -168,6 +179,8 @@ class arq:
                         subreddit (str): Subreddit to search
                 Returns:
                         result object (str): Result which you can access with dot notation, Ex - result.postLink
+
+                        result.postLink | .subreddit | .title | .url | .nsfw | .spoiler | .author | .ups | .preview
         '''
 
         results = DotMap()
@@ -189,6 +202,8 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].example
+
+                        result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         '''
 
         results = DotMap()
@@ -212,6 +227,8 @@ class arq:
                         limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
+
+                        result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         '''
 
         results = DotMap()
@@ -234,6 +251,8 @@ class arq:
                         link (str): Link To Fetch
                 Returns:
                         result object (str): Result which you can access with dot notation, Ex - result.video_url
+
+                        result.requested_url | .video_url
         '''
 
         results = DotMap()
@@ -254,6 +273,8 @@ class arq:
                         query (str): Query to compute
                 Returns:
                         result object (str): Result which you can access with dot notation, Ex - result.response
+
+                        result.query | .response
         '''
 
         results = DotMap()
@@ -263,19 +284,3 @@ class arq:
         results = DotMap(data)
         
         return results
-
-
-arq = arq()
-
-async def hoe():
-    songs = await arq.deezer("attention", 2)
-    torrents = await arq.torrent("porn", 2)
-    song = await arq.saavn("attention")
-    print(song[0].media_url)
-    print(songs[0].url)
-    print(songs[1].url)
-    print(torrents[0].magnet)
-asyncio.run(hoe())
-
-
-        
