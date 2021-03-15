@@ -13,9 +13,35 @@ class arq:
 
     Methods
     -------
-    deezer(song_name="thunder", limit=1):
-        Returns song object with 'limit' number of songs which you can use with song[0].title
+    deezer(query="never gonna give you up", limit=1):
+        Returns result object with 'limit' number of result which you can use access dot notation.
+    
+    torrent(query="tenet", limit=1):
+        Returns result object with 'limit' number of result which you can use access dot notation.
 
+    saavn(query="attention"):
+        Returns result object with 4-5 results which you can access with dot notation.
+    
+    youtube(query="carry minati", limit=1):
+        Returns result object with 'limit' number of result which you can access with dot notation.
+    
+    wall(query="cyberpunk", limit=1):
+        Returns result object with 'limit' number of result which you can access with dot notation.
+    
+    reddit(subreddit="linux"):
+        Returns result object with 1 result which you can access with dot notation.
+    
+    urbandict(query="hoe", limit=1):
+        Returns result object with 'limit' number of result which you can access with dot notation.
+    
+    prunhub(query="step sis in alabama", limit=1):
+        Returns result object with 'limit' number of result which you can access with dot notation.
+    
+    phdl(link="https://pornhubvideolinklol.com"):
+        Returns result object with a link which you can access with dot notation
+
+    luna(query="hello luna"):
+        Returns result object with a response of lunachatbot which you can access with dot notation.
 
     """
 
