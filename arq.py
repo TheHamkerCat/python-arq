@@ -1,5 +1,3 @@
-from functions import fetch
-from config import ARQ_API
 from dotmap import DotMap
 import asyncio
 import aiohttp
@@ -18,12 +16,16 @@ async def fetch(url):
     return data
 
 
-class arq:
-    
+class ARQ:
     """
     Arq class to access all the endpoints of api.
 
     ...
+
+    Parameters
+    ___________
+        ARQ_API (``str``):
+            Pass ARQ_API_BASE_URL as argument
 
     Methods
     -------
@@ -59,8 +61,10 @@ class arq:
 
     """
 
-    async def deezer(self, query: str, limit: int):
+    def __init__(self, ARQ_API):
+        self.ARQ_API = ARQ_API
 
+    async def deezer(self, query: str, limit: int):
         '''
         Returns An Object.
 
@@ -76,7 +80,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/deezer?query={query}&count={limit}"
+        api = f"{self.ARQ_API}/deezer?query={query}&count={limit}"
         data = await fetch(api)
         
         for i in range(len(data)):
@@ -86,7 +90,6 @@ class arq:
 
 
     async def torrent(self, query: str, limit: int):
-
         '''
         Returns An Object.
 
@@ -101,7 +104,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/torrent?query={query}"
+        api = f"{self.ARQ_API}/torrent?query={query}"
         data = await fetch(api)
         
         for i in range(limit):
@@ -111,7 +114,6 @@ class arq:
 
 
     async def saavn(self, query: str):
-
         '''
         Returns An Object.
 
@@ -125,7 +127,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/saavn?query={query}"
+        api = f"{self.ARQ_API}/saavn?query={query}"
         data = await fetch(api)
         
         for i in range(len(data)):
@@ -135,7 +137,6 @@ class arq:
 
 
     async def youtube(self, query: str, limit: str):
-
         '''
         Returns An Object.
 
@@ -150,7 +151,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/youtube?query={query}&count={limit}"
+        api = f"{self.ARQ_API}/youtube?query={query}&count={limit}"
         data = await fetch(api)
         
         for i in range(len(data)):
@@ -160,7 +161,6 @@ class arq:
 
 
     async def wall(self, query: str, limit: int):
-
         '''
         Returns An Object.
 
@@ -175,7 +175,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/wall?query={query}"
+        api = f"{self.ARQ_API}/wall?query={query}"
         data = await fetch(api)
         
         for i in range(limit):
@@ -185,7 +185,6 @@ class arq:
 
 
     async def reddit(self, subreddit: str):
-
         '''
         Returns An Object.
 
@@ -199,7 +198,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/reddit?query={subreddit}"
+        api = f"{self.ARQ_API}/reddit?query={subreddit}"
         data = await fetch(api)
         results = DotMap(data)
         
@@ -207,7 +206,6 @@ class arq:
 
 
     async def urbandict(self, query: str, limit: int):
-
         '''
         Returns An Object.
 
@@ -222,7 +220,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/ud?query={query}"
+        api = f"{self.ARQ_API}/ud?query={query}"
         data = await fetch(api)
         
         for i in range(limit):
@@ -232,7 +230,6 @@ class arq:
 
 
     async def prunhub(self, query: str, limit: int):
-
         '''
         Returns An Object.
 
@@ -247,7 +244,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/ph?query={query}"
+        api = f"{self.ARQ_API}/ph?query={query}"
         data = await fetch(api)
         
         for i in range(limit):
@@ -257,7 +254,6 @@ class arq:
 
 
     async def phdl(self, link: str):
-
         '''
         Returns An Object.
 
@@ -271,7 +267,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/phdl?query={link}"
+        api = f"{self.ARQ_API}/phdl?query={link}"
         data = await fetch(api)
         results = DotMap(data)
         
@@ -279,7 +275,6 @@ class arq:
 
 
     async def luna(self, query: str):
-
         '''
         Returns An Object.
 
@@ -293,7 +288,7 @@ class arq:
 
         results = DotMap()
         
-        api = f"{ARQ_API}/luna?query={query}"
+        api = f"{self.ARQ_API}/luna?query={query}"
         data = await fetch(api)
         results = DotMap(data)
         
