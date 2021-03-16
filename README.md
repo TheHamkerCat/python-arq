@@ -8,12 +8,12 @@ Asyncronous Python Wrapper For A.R.Q API.
 
 ## Requirements
 
-- Python 3.7 or higher.
+- Python 3.8 or higher.
 - ARQ_API url, Get it from [here](https://t.me/patheticprogrammers)
 
 ## Installation
 
-- `pip3 install Python_ARQ`
+- `pip3 install -U python-arq`
 
 ## Usage
 
