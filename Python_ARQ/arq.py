@@ -40,8 +40,8 @@ class ARQ:
     youtube(query="carry minati", limit=1):
         Returns result object with 'limit' number of result which you can access with dot notation.
 
-    wall(query="cyberpunk", limit=1):
-        Returns result object with 'limit' number of result which you can access with dot notation.
+    wall(query="cyberpunk"):
+        Returns result object which you can access with dot notation.
 
     reddit(subreddit="linux"):
         Returns result object with 1 result which you can access with dot notation.
@@ -155,13 +155,12 @@ class ARQ:
 
         return results
 
-    async def wall(self, query: str, limit: int):
+    async def wall(self, query: str):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].url_image
 
@@ -172,9 +171,9 @@ class ARQ:
 
         api = f"{self.ARQ_API}/wall?query={query}"
         data = await fetch(api)
-
-        for i in range(limit):
-            results[i] = DotMap(data["wallpapers"][i])
+        data = data["wallpapers"]
+        for i in range(len(data)):
+            results[i] = DotMap(data[i])
 
         return results
 
