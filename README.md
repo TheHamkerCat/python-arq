@@ -13,7 +13,10 @@ Asyncronous Python Wrapper For A.R.Q API.
 
 ## Installation
 
+- `pip3 install requests` # This is needed to install this repo, you can remove it later
 - `pip3 install -U python-arq`
+- `pip3 uninstall requests` # Optional
+
 
 ## Usage
 
