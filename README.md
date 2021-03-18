@@ -13,9 +13,9 @@ Asyncronous Python Wrapper For A.R.Q API.
 
 ## Installation
 
-- `pip3 install requests` # This is needed to install this repo, you can remove it later
-- `pip3 install -U python-arq`
-- `pip3 uninstall requests` # Optional
+```sh
+$ pip3 install -U python-arq
+```
 
 
 ## Usage
@@ -66,11 +66,12 @@ print(help(ARQ.deezer))
 2. Jiosaavn
 3. Youtube
 4. PronHub
-5. Reddit
-6. Urban Dictionary
-7. Torrent
-8. Wallpapers
-9. AI Chatbot
+5. Reddit 
+6. Torrent
+7. Wallpapers
+8. Urban Dictionary
+9. Luna AI Chatbot
+10. Google Drive
 
 ## Note
 1. I'll add more features soon.

@@ -58,6 +58,8 @@ class ARQ:
     luna(query="hello luna"):
         Returns result object with a response of lunachatbot which you can access with dot notation.
 
+    drive(query="iron man")
+        Returns result object which you can access with dot notation.
     """
 
     def __init__(self, ARQ_API):
@@ -76,15 +78,11 @@ class ARQ:
                         result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
 
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/deezer?query={query}&count={limit}"
         data = await fetch(api)
-
         for i in range(len(data)):
             results[i] = DotMap(data[i])
-
         return results
 
     async def torrent(self, query: str, limit: int):
@@ -99,15 +97,11 @@ class ARQ:
 
                         result[result_number].name | .uploaded | .size | .seeds | .leechs | .magnet
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/torrent?query={query}"
         data = await fetch(api)
-
         for i in range(limit):
             results[i] = DotMap(data[i])
-
         return results
 
     async def saavn(self, query: str):
@@ -121,15 +115,11 @@ class ARQ:
 
                         result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/saavn?query={query}"
         data = await fetch(api)
-
         for i in range(len(data)):
             results[i] = DotMap(data[i])
-
         return results
 
     async def youtube(self, query: str, limit: str):
@@ -144,15 +134,11 @@ class ARQ:
 
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/youtube?query={query}&count={limit}"
         data = await fetch(api)
-
         for i in range(len(data)):
             results[i] = DotMap(data[i])
-
         return results
 
     async def wall(self, query: str):
@@ -166,15 +152,12 @@ class ARQ:
 
                         result[result_number].id | .width | .height | .file_type | .file_size | .url_image | .url_thumb | .url_page
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/wall?query={query}"
         data = await fetch(api)
         data = data["wallpapers"]
         for i in range(len(data)):
             results[i] = DotMap(data[i])
-
         return results
 
     async def reddit(self, subreddit: str):
@@ -188,13 +171,10 @@ class ARQ:
 
                         result.postLink | .subreddit | .title | .url | .nsfw | .spoiler | .author | .ups | .preview
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/reddit?query={subreddit}"
         data = await fetch(api)
         results = DotMap(data)
-
         return results
 
     async def urbandict(self, query: str, limit: int):
@@ -209,15 +189,11 @@ class ARQ:
 
                         result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/ud?query={query}"
         data = await fetch(api)
-
         for i in range(limit):
             results[i] = DotMap(data["list"][i])
-
         return results
 
     async def prunhub(self, query: str, limit: int):
@@ -232,15 +208,11 @@ class ARQ:
 
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/ph?query={query}"
         data = await fetch(api)
-
         for i in range(limit):
             results[i] = DotMap(data[i])
-
         return results
 
     async def phdl(self, link: str):
@@ -254,13 +226,10 @@ class ARQ:
 
                         result.requested_url | .video_url
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/phdl?query={link}"
         data = await fetch(api)
         results = DotMap(data)
-
         return results
 
     async def luna(self, query: str):
@@ -274,12 +243,27 @@ class ARQ:
 
                         result.query | .response
         """
-
         results = DotMap()
-
         api = f"{self.ARQ_API}/luna?query={query}"
         data = await fetch(api)
         results = DotMap(data)
-
         return results
 
+
+    async def drive(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Query to search
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].url
+
+                        result[result_number].type | .name | .size | .url
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/drive?query={query}"
+        data = await fetch(api)
+        for i in range(len(data)):
+            results[i] = DotMap(data[i])
+        return results
