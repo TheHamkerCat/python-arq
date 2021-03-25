@@ -26,17 +26,34 @@ For Example, to get a song link from deezer, you can do this
     
 ```python
 ​
-from Python_ARQ import ARQ
+# Input
 
+from Python_ARQ import ARQ
+import asyncio
+
+# class to pass api url
 arq = ARQ(Api_Url)
 
-song = await arq.deezer(query="Never gonna give you up", limit=1)
 
-song_link = song[0].url
+# create Function to search a song
+async def func(query: str):
+ song = await arq.deezer(query=query, limit=1)
+ return song[0].url
 
-print(song_link)
 
->> Output:
+# main function
+async def main():
+ output = await func("Never gonna give you up")
+ print(output)
+
+
+# Run in async loop
+if __name__ == "__main__":
+ asyncio.run(main())
+
+
+
+# Output:
 https://e-cdns-proxy-3.dzcdn.net/api/1/f1fb0b260a55f594c20d4592c752708460c4864fb97de0be8b459c3b63ff69817d97eddffd60bfbf9f6de5a89d0dbf8864c3f107173b1bfa601b4442aee694e4e67427534a7c8b1a145d2a931fd3429e
 ​
 ```
