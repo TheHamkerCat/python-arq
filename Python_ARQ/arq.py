@@ -189,9 +189,9 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/ud?query={query}"
-        data = await fetch(api)
+        data = (await fetch(api))["list"]
         for i in range(len(data)):
-            results[i] = DotMap(data["list"][i])
+            results[i] = DotMap(data[i])
         return results
 
     async def prunhub(self, query: str):
