@@ -31,8 +31,8 @@ class ARQ:
     deezer(query="never gonna give you up", limit=1):
         Returns result object with 'limit' number of result which you can use access dot notation.
 
-    torrent(query="tenet", limit=1):
-        Returns result object with 'limit' number of result which you can use access dot notation.
+    torrent(query="tenet"):
+        Returns result object which you can use access dot notation.
 
     saavn(query="attention"):
         Returns result object with 4-5 results which you can access with dot notation.
@@ -46,11 +46,11 @@ class ARQ:
     reddit(subreddit="linux"):
         Returns result object with 1 result which you can access with dot notation.
 
-    urbandict(query="hoe", limit=1):
-        Returns result object with 'limit' number of result which you can access with dot notation.
+    urbandict(query="hoe"):
+        Returns result object which you can access with dot notation.
 
-    prunhub(query="step sis in alabama", limit=1):
-        Returns result object with 'limit' number of result which you can access with dot notation.
+    prunhub(query="step sis in alabama"):
+        Returns result object which you can access with dot notation.
 
     phdl(link="https://pornhubvideolinklol.com"):
         Returns result object with a link which you can access with dot notation
@@ -85,13 +85,12 @@ class ARQ:
             results[i] = DotMap(data[i])
         return results
 
-    async def torrent(self, query: str, limit: int):
+    async def torrent(self, query: str):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].magnet
 
@@ -100,7 +99,7 @@ class ARQ:
         results = DotMap()
         api = f"{self.ARQ_API}/torrent?query={query}"
         data = await fetch(api)
-        for i in range(limit):
+        for i in range(len(data)):
             results[i] = DotMap(data[i])
         return results
 
@@ -177,13 +176,12 @@ class ARQ:
         results = DotMap(data)
         return results
 
-    async def urbandict(self, query: str, limit: int):
+    async def urbandict(self, query: str):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].example
 
@@ -192,17 +190,16 @@ class ARQ:
         results = DotMap()
         api = f"{self.ARQ_API}/ud?query={query}"
         data = await fetch(api)
-        for i in range(limit):
+        for i in range(len(data)):
             results[i] = DotMap(data["list"][i])
         return results
 
-    async def prunhub(self, query: str, limit: int):
+    async def prunhub(self, query: str):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
 
@@ -211,7 +208,7 @@ class ARQ:
         results = DotMap()
         api = f"{self.ARQ_API}/ph?query={query}"
         data = await fetch(api)
-        for i in range(limit):
+        for i in range(len(data)):
             results[i] = DotMap(data[i])
         return results
 
