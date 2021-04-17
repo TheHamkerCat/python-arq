@@ -10,7 +10,7 @@ requires = requirements.splitlines()
 setup(
   name = 'Python_ARQ',
   packages = ['Python_ARQ'],
-  version = '1.7', 
+  version = '1.8', 
   license='MIT',  
   description = 'Asynchronous Python Wrapper For A.R.Q API. ',
   long_description=readme,

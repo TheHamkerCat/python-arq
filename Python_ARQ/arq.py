@@ -60,6 +60,9 @@ class ARQ:
 
     drive(query="iron man")
         Returns result object which you can access with dot notation.
+
+    lyrics(query="So Far Away Martin Garrix")
+        Returns result object which you can access with dot notation.
     """
 
     def __init__(self, ARQ_API):
@@ -263,4 +266,22 @@ class ARQ:
         data = await fetch(api)
         for i in range(len(data)):
             results[i] = DotMap(data[i])
+        return results
+
+
+    async def lyrics(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Query to search
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.lyrics
+
+                        results.lyrics
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/lyrics?query={query}"
+        data = await fetch(api)
+        results = DotMap(data)
         return results
