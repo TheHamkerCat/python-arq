@@ -37,8 +37,8 @@ class ARQ:
     saavn(query="attention"):
         Returns result object with 4-5 results which you can access with dot notation.
 
-    youtube(query="carry minati", limit=1):
-        Returns result object with 'limit' number of result which you can access with dot notation.
+    youtube(query="carry minati"):
+        Returns result object which you can access with dot notation.
 
     wall(query="cyberpunk"):
         Returns result object which you can access with dot notation.
@@ -121,7 +121,7 @@ class ARQ:
             results[i] = DotMap(data[i])
         return results
 
-    async def youtube(self, query: str, limit: str):
+    async def youtube(self, query: str):
         """
         Returns An Object.
 
@@ -134,7 +134,7 @@ class ARQ:
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
         results = DotMap()
-        api = f"{self.ARQ_API}/youtube?query={query}&count={limit}"
+        api = f"{self.ARQ_API}/youtube?query={query}"
         data = await fetch(api)
         for i in range(len(data)):
             results[i] = DotMap(data[i])
