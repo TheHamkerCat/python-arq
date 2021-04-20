@@ -63,6 +63,9 @@ class ARQ:
 
     lyrics(query="So Far Away Martin Garrix")
         Returns result object which you can access with dot notation.
+    
+    wiki(query="dog")
+        Returns result object which you can access with dot notation.
     """
 
     def __init__(self, ARQ_API):
@@ -282,6 +285,24 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/lyrics?query={query}"
+        data = await fetch(api)
+        results = DotMap(data)
+        return results
+
+
+    async def wiki(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Query to search
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.title
+
+                        results.title | .answer
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/wiki?query={query}"
         data = await fetch(api)
         results = DotMap(data)
         return results
