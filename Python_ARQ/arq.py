@@ -66,6 +66,9 @@ class ARQ:
     
     wiki(query="dog")
         Returns result object which you can access with dot notation.
+
+    nsfw_scan(url="https://someurl.cum/a.jpg")
+        Returns result object which you can access with dot notation.
     """
 
     def __init__(self, ARQ_API):
@@ -303,6 +306,24 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/wiki?query={query}"
+        data = await fetch(api)
+        results = DotMap(data)
+        return results
+
+
+    async def nsfw_scan(self, url: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        url (str): URL to scan
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.data
+
+                        results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/nsfw_scan?url={url}"
         data = await fetch(api)
         results = DotMap(data)
         return results

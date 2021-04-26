@@ -91,6 +91,7 @@ print(help(ARQ.deezer))
 10. Google Drive
 11. Lyrics
 12. Wikipedia
+13. NSFW Image Classification
 
 ## Note
 1. I'll add more features soon.
