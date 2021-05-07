@@ -56,18 +56,21 @@ class ARQ:
         Returns result object with a link which you can access with dot notation
 
     luna(query="hello luna"):
-        Returns result object with a response of lunachatbot which you can access with dot notation.
-
-    drive(query="iron man")
         Returns result object which you can access with dot notation.
 
     lyrics(query="So Far Away Martin Garrix")
         Returns result object which you can access with dot notation.
-    
+
     wiki(query="dog")
         Returns result object which you can access with dot notation.
 
     nsfw_scan(url="https://someurl.cum/a.jpg")
+        Returns result object which you can access with dot notation.
+
+    ocr(url="https://someurl.cum/a.jpg")
+        Returns result object which you can access with dot notation.
+
+    stats()
         Returns result object which you can access with dot notation.
     """
 
@@ -255,26 +258,6 @@ class ARQ:
         results = DotMap(data)
         return results
 
-
-    async def drive(self, query: str):
-        """
-        Returns An Object.
-
-                Parameters:
-                        query (str): Query to search
-                Returns:
-                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].url
-
-                        result[result_number].type | .name | .size | .url
-        """
-        results = DotMap()
-        api = f"{self.ARQ_API}/drive?query={query}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
-        return results
-
-
     async def lyrics(self, query: str):
         """
         Returns An Object.
@@ -291,7 +274,6 @@ class ARQ:
         data = await fetch(api)
         results = DotMap(data)
         return results
-
 
     async def wiki(self, query: str):
         """
@@ -310,7 +292,6 @@ class ARQ:
         results = DotMap(data)
         return results
 
-
     async def nsfw_scan(self, url: str):
         """
         Returns An Object.
@@ -320,10 +301,44 @@ class ARQ:
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results.data
 
-                        results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn
+                        results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
         results = DotMap()
         api = f"{self.ARQ_API}/nsfw_scan?url={url}"
+        data = await fetch(api)
+        results = DotMap(data)
+        return results
+
+    async def ocr(self, url: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        url (str): URL to perform ocr
+                Returns:
+                        Result object (str): Results which you can access with dot notation
+
+                        results.ocr
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/ocr?url={url}"
+        data = await fetch(api)
+        results = DotMap(data)
+        return results
+
+    async def stats(self):
+        """
+        Returns An Object.
+
+                Parameters:
+                        None
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.uptime
+
+                        results.uptime | .requests | .cpu | .memory.server | .memory.api | .disk | .platform | .python
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/stats"
         data = await fetch(api)
         results = DotMap(data)
         return results

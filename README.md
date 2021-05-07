@@ -88,10 +88,10 @@ print(help(ARQ.deezer))
 7. Wallpapers
 8. Urban Dictionary
 9. Luna AI Chatbot
-10. Google Drive
 11. Lyrics
 12. Wikipedia
 13. NSFW Image Classification
+14. Optical Character Recognition (OCR)
 
 ## Note
 1. I'll add more features soon.
