@@ -77,6 +77,10 @@ print(help(ARQ.deezer))
 ```
 </h3>
 
+## Note
+
+Get API KEY and API URL from [ARQRobot](https://t.me/ARQRobot).
+
 ## Features as of now [List of APIs]
 
 1. Deezer
@@ -92,6 +96,8 @@ print(help(ARQ.deezer))
 12. Wikipedia
 13. NSFW Image Classification
 14. Optical Character Recognition (OCR)
+15. Generate "Truly" Random Numbers Using Atmospheric Noise
+16. Proxy Scraper
 
 ## Note
 1. I'll add more features soon.

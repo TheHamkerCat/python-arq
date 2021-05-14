@@ -1,17 +1,17 @@
-from dotmap import DotMap
 import aiohttp
-
+from dotmap import DotMap
 
 # Fetches Json
 
 
-async def fetch(url):
+async def fetch(url: str, api_key: str):
+    headers = {"X-API-KEY": api_key}
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            try:
-                data = await resp.json()
-            except:
-                data = await resp.text()
+        async with session.get(url, headers=headers) as resp:
+            data = await resp.json()
+            if "detail" in data.keys():
+                raise Exception(data['detail'])
+                return
     return data
 
 
@@ -29,53 +29,76 @@ class ARQ:
     Methods
     -------
     deezer(query="never gonna give you up", limit=1):
-        Returns result object with 'limit' number of result which you can use access dot notation.
+        Get songs from deezer.
+            Returns result object with 'limit' number of result which you can use access dot notation.
 
     torrent(query="tenet"):
-        Returns result object which you can use access dot notation.
+        Search for torrent across many websites.
+            Returns result object which you can use access dot notation.
 
     saavn(query="attention"):
-        Returns result object with 4-5 results which you can access with dot notation.
+        Get songs from Saavn.
+            Returns result object with 4-5 results which you can access with dot notation.
 
     youtube(query="carry minati"):
-        Returns result object which you can access with dot notation.
+        Search on youtube.
+            Returns result object which you can access with dot notation.
 
     wall(query="cyberpunk"):
         Returns result object which you can access with dot notation.
 
     reddit(subreddit="linux"):
-        Returns result object with 1 result which you can access with dot notation.
+        Search wallpapers.
+            Returns result object with 1 result which you can access with dot notation.
 
     urbandict(query="hoe"):
-        Returns result object which you can access with dot notation.
+        Search for a word on urban dictionary.
+            Returns result object which you can access with dot notation.
 
     prunhub(query="step sis in alabama"):
-        Returns result object which you can access with dot notation.
+        Search for a prunhub video.
+            Returns result object which you can access with dot notation.
 
     phdl(link="https://pornhubvideolinklol.com"):
-        Returns result object with a link which you can access with dot notation
+        Download a prunhub video.
+            Returns result object with a link which you can access with dot notation
 
     luna(query="hello luna"):
-        Returns result object which you can access with dot notation.
+        Communicate with an AI chatbot.
+            Returns result object which you can access with dot notation.
 
     lyrics(query="So Far Away Martin Garrix")
-        Returns result object which you can access with dot notation.
+        Search for song lyrics.
+            Returns result object which you can access with dot notation.
 
     wiki(query="dog")
-        Returns result object which you can access with dot notation.
+        Search for something on wikipedia.
+            Returns result object which you can access with dot notation.
 
     nsfw_scan(url="https://someurl.cum/a.jpg")
-        Returns result object which you can access with dot notation.
+        Scan and classify an image.
+            Returns result object which you can access with dot notation.
 
     ocr(url="https://someurl.cum/a.jpg")
-        Returns result object which you can access with dot notation.
+        Do OCR on an image.
+            Returns result object which you can access with dot notation.
 
     stats()
-        Returns result object which you can access with dot notation.
+        Get statistics of ARQ server.
+            Returns result object which you can access with dot notation.
+
+    random(min=0, max=1000)
+        Generate a true random number using atmospheric noise.
+            Returns result object which you can access with dot notation.
+
+    proxy()
+        Generate a proxy, sock5.
+            Returns result object which you can access with dot notation.
     """
 
-    def __init__(self, ARQ_API):
+    def __init__(self, ARQ_API, API_KEY):
         self.ARQ_API = ARQ_API
+        self.API_KEY = API_KEY
 
     async def deezer(self, query: str, limit: int):
         """
@@ -92,9 +115,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/deezer?query={query}&count={limit}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def torrent(self, query: str):
@@ -110,9 +132,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/torrent?query={query}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def saavn(self, query: str):
@@ -128,9 +149,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/saavn?query={query}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def youtube(self, query: str):
@@ -147,9 +167,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/youtube?query={query}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def wall(self, query: str):
@@ -165,10 +184,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/wall?query={query}"
-        data = await fetch(api)
-        data = data["wallpapers"]
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def reddit(self, subreddit: str):
@@ -184,7 +201,7 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/reddit?query={subreddit}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -201,9 +218,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/ud?query={query}"
-        data = (await fetch(api))["list"]
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def prunhub(self, query: str):
@@ -219,9 +235,8 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/ph?query={query}"
-        data = await fetch(api)
-        for i in range(len(data)):
-            results[i] = DotMap(data[i])
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
         return results
 
     async def phdl(self, link: str):
@@ -231,13 +246,11 @@ class ARQ:
                 Parameters:
                         link (str): Link To Fetch
                 Returns:
-                        result object (str): Result which you can access with dot notation, Ex - result.video_url
-
-                        result.requested_url | .video_url
+                        result object (str): Result
         """
         results = DotMap()
-        api = f"{self.ARQ_API}/phdl?query={link}"
-        data = await fetch(api)
+        api = f"{self.ARQ_API}/phdl?url={link}"
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -248,13 +261,11 @@ class ARQ:
                 Parameters:
                         query (str): Query to compute
                 Returns:
-                        result object (str): Result which you can access with dot notation, Ex - result.response
-
-                        result.query | .response
+                        result object (str): Result
         """
         results = DotMap()
         api = f"{self.ARQ_API}/luna?query={query}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -271,7 +282,7 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/lyrics?query={query}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -288,7 +299,7 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/wiki?query={query}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -305,7 +316,7 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/nsfw_scan?url={url}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -322,7 +333,7 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/ocr?url={url}"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
 
@@ -339,6 +350,39 @@ class ARQ:
         """
         results = DotMap()
         api = f"{self.ARQ_API}/stats"
-        data = await fetch(api)
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
+        return results
+
+    async def random(self, min: int, max: int):
+        """
+        Returns An Object.
+
+                Parameters:
+                        min (min): Minimum limit
+                        max (int): Maximum limit
+                Returns:
+                        Result object (str): Result
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/random?min={min}&max={max}"
+        data = await fetch(api, self.API_KEY)
+        results = DotMap(data)
+        return results
+
+    async def proxy(self):
+        """
+        Returns An Object.
+
+                Parameters:
+                        None
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.uptime
+
+                        results.location | .proxy
+        """
+        results = DotMap()
+        api = f"{self.ARQ_API}/proxy"
+        data = await fetch(api, self.API_KEY)
         results = DotMap(data)
         return results
