@@ -83,6 +83,10 @@ class ARQ:
     proxy()
         Generate a proxy, sock5.
             Returns result object which you can access with dot notation.
+
+    tmdb(query: str = "")
+        Search Something on TMDB
+            Returns result object which you can access with dot notation.
     """
 
     def __init__(self, api_url: str, api_key: str):
@@ -208,14 +212,16 @@ class ARQ:
 
                         - query: Search query, optional, defaults to ""
                         - page: Page number, optional, defaults to 1
-                        - thumbsize: Size of the thumbnail, optional, 
+                        - thumbsize: Size of the thumbnail, optional,
                           defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
 
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
-        return await self._fetch("ph", {"query": query, "page": page, "thumbsize": thumbsize})
+        return await self._fetch(
+            "ph", {"query": query, "page": page, "thumbsize": thumbsize}
+        )
 
     async def phdl(self, url: str):
         """
@@ -328,3 +334,16 @@ class ARQ:
                         results.location | .proxy
         """
         return await self._fetch("proxy")
+
+    async def tmdb(self, query: str = ""):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Search something on TMDB
+                Returns:
+                        Result object (str): Results which you can access with dot notation
+
+                        results.id | .title | .overview | .rating | .releaseDate | .genre | .backdrop | .poster
+        """
+        return await self._fetch("tmdb", {"query": query})
