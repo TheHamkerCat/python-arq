@@ -1,18 +1,5 @@
 import aiohttp
-from dotmap import DotMap
-
-# Fetches Json
-
-
-async def fetch(url: str, api_key: str):
-    headers = {"X-API-KEY": api_key}
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as resp:
-            data = await resp.json()
-            if "detail" in data.keys():
-                raise Exception(data['detail'])
-                return
-    return data
+from urllib.parse import urlencode
 
 
 class ARQ:
@@ -96,28 +83,35 @@ class ARQ:
             Returns result object which you can access with dot notation.
     """
 
-    def __init__(self, ARQ_API, API_KEY):
-        self.ARQ_API = ARQ_API
-        self.API_KEY = API_KEY
+    def __init__(self, api_url: str, api_key: str):
+        self.api_url = api_url[:-1] if api_url.endswith('/') else api_url
+        self.api_key = api_key
 
-    async def deezer(self, query: str, limit: int):
+    async def _fetch(self, route, params={}):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'{self.api_url}/{route}?{urlencode(params)}', headers={"X-API-KEY": self.api_key}) as resp:
+                if resp.status in (401, 403,):
+                    raise Exception("Invalid API key")
+                ok, result = (await resp.json()).values()
+                if ok:
+                    return result
+                else:
+                    raise Exception(result)
+
+    async def deezer(self, query: str, count: int):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
+                        count (int): Number of results to return
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].url
 
                         result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
 
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/deezer?query={query}&count={limit}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("deezer", {"query": query, "count": count})
 
     async def torrent(self, query: str):
         """
@@ -130,11 +124,7 @@ class ARQ:
 
                         result[result_number].name | .uploaded | .size | .seeds | .leechs | .magnet
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/torrent?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("torrent", {"query": query})
 
     async def saavn(self, query: str):
         """
@@ -147,11 +137,7 @@ class ARQ:
 
                         result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/saavn?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("saavn", {"query": query})
 
     async def youtube(self, query: str):
         """
@@ -165,11 +151,7 @@ class ARQ:
 
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/youtube?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("youtube", {"query": query})
 
     async def wall(self, query: str):
         """
@@ -182,28 +164,20 @@ class ARQ:
 
                         result[result_number].id | .width | .height | .file_type | .file_size | .url_image | .url_thumb | .url_page
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/wall?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("wall", {"query": query})
 
-    async def reddit(self, subreddit: str):
+    async def reddit(self, query: str):
         """
         Returns An Object.
 
                 Parameters:
-                        subreddit (str): Subreddit to search
+                        query (str): Subreddit to search
                 Returns:
                         result object (str): Result which you can access with dot notation, Ex - result.postLink
 
                         result.postLink | .subreddit | .title | .url | .nsfw | .spoiler | .author | .ups | .preview
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/reddit?query={subreddit}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("reddit", {"query": query})
 
     async def urbandict(self, query: str):
         """
@@ -216,11 +190,7 @@ class ARQ:
 
                         result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/ud?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("id", {"query": query})
 
     async def prunhub(self, query: str):
         """
@@ -233,26 +203,18 @@ class ARQ:
 
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/ph?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("ph", {"query": query})
 
-    async def phdl(self, link: str):
+    async def phdl(self, url: str):
         """
         Returns An Object.
 
                 Parameters:
-                        link (str): Link To Fetch
+                        url (str): URL To Fetch
                 Returns:
                         result object (str): Result
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/phdl?url={link}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("phdl", {"url": url})
 
     async def luna(self, query: str):
         """
@@ -263,11 +225,7 @@ class ARQ:
                 Returns:
                         result object (str): Result
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/luna?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("luna", {"query": query})
 
     async def lyrics(self, query: str):
         """
@@ -280,11 +238,7 @@ class ARQ:
 
                         results.lyrics
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/lyrics?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("lyrics", {"query": query})
 
     async def wiki(self, query: str):
         """
@@ -297,11 +251,7 @@ class ARQ:
 
                         results.title | .answer
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/wiki?query={query}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("wiki", {"query": query})
 
     async def nsfw_scan(self, url: str):
         """
@@ -314,11 +264,7 @@ class ARQ:
 
                         results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/nsfw_scan?url={url}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("nsfw_scan", {"url": url})
 
     async def ocr(self, url: str):
         """
@@ -331,11 +277,7 @@ class ARQ:
 
                         results.ocr
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/ocr?url={url}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("ocr", {"url": url})
 
     async def stats(self):
         """
@@ -348,11 +290,7 @@ class ARQ:
 
                         results.uptime | .requests | .cpu | .memory.server | .memory.api | .disk | .platform | .python
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/stats"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("stats")
 
     async def random(self, min: int, max: int):
         """
@@ -364,11 +302,7 @@ class ARQ:
                 Returns:
                         Result object (str): Result
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/random?min={min}&max={max}"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("random", {"min": min, "max": max})
 
     async def proxy(self):
         """
@@ -381,8 +315,4 @@ class ARQ:
 
                         results.location | .proxy
         """
-        results = DotMap()
-        api = f"{self.ARQ_API}/proxy"
-        data = await fetch(api, self.API_KEY)
-        results = DotMap(data)
-        return results
+        return await self._fetch("proxy")
