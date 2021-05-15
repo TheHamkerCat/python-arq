@@ -215,7 +215,7 @@ class ARQ:
 
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
-        return await self._fetch("ph", {"query": query}, {"page": page}, {"thumbsize": thumbsize})
+        return await self._fetch("ph", {"query": query, "page": page, "thumbsize": thumbsize})
 
     async def phdl(self, url: str):
         """
