@@ -1,5 +1,7 @@
-import aiohttp
 from urllib.parse import urlencode
+
+import aiohttp
+from dotmap import DotMap
 
 
 class ARQ:
@@ -84,19 +86,25 @@ class ARQ:
     """
 
     def __init__(self, api_url: str, api_key: str):
-        self.api_url = api_url[:-1] if api_url.endswith('/') else api_url
+        self.api_url = api_url[:-1] if api_url.endswith("/") else api_url
         self.api_key = api_key
 
     async def _fetch(self, route, params={}):
         async with aiohttp.ClientSession() as session:
-            async with session.get(f'{self.api_url}/{route}?{urlencode(params)}', headers={"X-API-KEY": self.api_key}) as resp:
-                if resp.status in (401, 403,):
+            async with session.get(
+                f"{self.api_url}/{route}?{urlencode(params)}",
+                headers={"X-API-KEY": self.api_key},
+            ) as resp:
+                if resp.status in (
+                    401,
+                    403,
+                ):
                     raise Exception("Invalid API key")
-                ok, result = (await resp.json()).values()
-                if ok:
-                    return result
-                else:
-                    raise Exception(result)
+                response = await resp.json()
+        ok, result = response
+        if ok:
+            return DotMap(response)
+        raise Exception(result)
 
     async def deezer(self, query: str, count: int):
         """
