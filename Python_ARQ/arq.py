@@ -44,8 +44,8 @@ class ARQ:
         Search for a word on urban dictionary.
             Returns result object which you can access with dot notation.
 
-    prunhub(query="step sis in alabama"):
-        Search for a prunhub video.
+    pornhub(query="step sis in alabama"):
+        Search pornhub videos.
             Returns result object which you can access with dot notation.
 
     phdl(link="https://pornhubvideolinklol.com"):
@@ -200,18 +200,22 @@ class ARQ:
         """
         return await self._fetch("id", {"query": query})
 
-    async def prunhub(self, query: str):
+    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
         Returns An Object.
 
                 Parameters:
-                        query (str): Query to search
+
+                        - query: Search query, optional, defaults to ""
+                        - page: Page number, optional, defaults to 1
+                        - thumbsize: Size of the thumbnail, optional, 
+                          defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
 
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
-        return await self._fetch("ph", {"query": query})
+        return await self._fetch("ph", {"query": query}, {"page": page}, {"thumbsize": thumbsize})
 
     async def phdl(self, url: str):
         """
