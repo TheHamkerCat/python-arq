@@ -56,7 +56,7 @@ class ARQ:
         Download a prunhub video.
             Returns result object with a link which you can access with dot notation
 
-    luna(query="hello luna"):
+    luna(query="hello luna", id=user_id):
         Communicate with an AI chatbot.
             Returns result object which you can access with dot notation.
 
@@ -270,16 +270,17 @@ class ARQ:
         """
         return await self._fetch("phdl", {"url": url})
 
-    async def luna(self, query: str):
+    async def luna(self, query: str, id: int = 0):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to compute
+                        id (int): Unique user_id.
                 Returns:
                         result object (str): Result
         """
-        return await self._fetch("luna", {"query": query})
+        return await self._fetch("luna", {"query": query, "id": id})
 
     async def lyrics(self, query: str):
         """
