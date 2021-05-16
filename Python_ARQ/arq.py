@@ -68,10 +68,6 @@ class ARQ:
         Scan and classify an image.
             Returns result object which you can access with dot notation.
 
-    ocr(url="https://someurl.cum/a.jpg")
-        Do OCR on an image.
-            Returns result object which you can access with dot notation.
-
     stats()
         Get statistics of ARQ server.
             Returns result object which you can access with dot notation.
@@ -283,19 +279,6 @@ class ARQ:
                         results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
         return await self._fetch("nsfw_scan", {"url": url})
-
-    async def ocr(self, url: str):
-        """
-        Returns An Object.
-
-                Parameters:
-                        url (str): URL to perform ocr
-                Returns:
-                        Result object (str): Results which you can access with dot notation
-
-                        results.ocr
-        """
-        return await self._fetch("ocr", {"url": url})
 
     async def stats(self):
         """
