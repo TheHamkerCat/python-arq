@@ -1,8 +1,11 @@
-from pyrogram.types import Message
-from urllib.parse import urlencode
+from base64 import b64decode
 from html import escape
+from re import sub
+from urllib.parse import urlencode
+
 import aiohttp
 from dotmap import DotMap
+from pyrogram.types import Message
 
 
 class ARQ:
@@ -116,7 +119,7 @@ class ARQ:
             async with session.post(
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
-                data=payload,
+                params={"payload": str(payload)},
             ) as resp:
                 if resp.status in (
                     401,
@@ -126,6 +129,9 @@ class ARQ:
                 response = await resp.json()
         ok, result = response
         if ok:
+            response["result"] = b64decode(
+                sub("data:image/png;base64", "", response["result"])
+            )
             return DotMap(response)
         raise Exception(result)
 
@@ -142,7 +148,9 @@ class ARQ:
                         result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
 
         """
-        return await self._fetch("deezer", {"query": escape(query), "count": escape(count)})
+        return await self._fetch(
+            "deezer", {"query": escape(query), "count": escape(count)}
+        )
 
     async def torrent(self, query: str):
         """
@@ -239,8 +247,12 @@ class ARQ:
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
         return await self._fetch(
-            "ph", {"query": escape(query), "page": escape(
-                page), "thumbsize": escape(thumbsize)}
+            "ph",
+            {
+                "query": escape(query),
+                "page": escape(page),
+                "thumbsize": escape(thumbsize),
+            },
         )
 
     async def phdl(self, url: str):
@@ -377,8 +389,11 @@ class ARQ:
                             "type": entity.type,
                             "offset": entity.offset,
                             "length": entity.length,
-                        } for entity in message.entities
-                    ] if message.entities else [],
+                        }
+                        for entity in message.entities
+                    ]
+                    if message.entities
+                    else [],
                     "chatId": message.from_user.id,
                     "avatar": True,
                     "from": {
@@ -390,10 +405,14 @@ class ARQ:
                             "small_file_id": message.photo.small_file_id,
                             "small_photo_unique_id": message.photo.small_photo_unique_id,
                             "big_file_id": message.photo.big_file_id,
-                            "big_photo_unique_id":  message.photo.big_photo_unique_id
-                        } if message.photo else "",
+                            "big_photo_unique_id": message.photo.big_photo_unique_id,
+                        }
+                        if message.photo
+                        else "",
                         "type": message.chat.type,
-                        "name": (message.from_user.first_name + message.from_user.last_name)
+                        "name": (
+                            message.from_user.first_name + message.from_user.last_name
+                        )
                         if message.from_user.last_name
                         else message.from_user.first_name,
                     },
