@@ -152,9 +152,7 @@ class ARQ:
                         result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
 
         """
-        return await self._fetch(
-            "deezer", {"query": query, "count": count}
-        )
+        return await self._fetch("deezer", {"query": query, "count": count})
 
     async def torrent(self, query: str):
         """
@@ -399,7 +397,9 @@ class ARQ:
                     ]
                     if message.entities
                     else [],
-                    "chatId": message.from_user.id,
+                    "chatId": message.forward_from.id
+                    if message.forward_from
+                    else message.from_user.id,
                     "avatar": True,
                     "from": {
                         "id": message.from_user.id,
@@ -407,12 +407,12 @@ class ARQ:
                         if message.from_user.username
                         else "",
                         "photo": {
-                            "small_file_id": message.photo.small_file_id,
-                            "small_photo_unique_id": message.photo.small_photo_unique_id,
-                            "big_file_id": message.photo.big_file_id,
-                            "big_photo_unique_id": message.photo.big_photo_unique_id,
+                            "small_file_id": message.from_user.photo.small_file_id,
+                            "small_photo_unique_id": message.from_user.photo.small_photo_unique_id,
+                            "big_file_id": message.from_user.photo.big_file_id,
+                            "big_photo_unique_id": message.from_user.photo.big_photo_unique_id,
                         }
-                        if message.photo
+                        if message.from_user.photo
                         else "",
                         "type": message.chat.type,
                         "name": (
@@ -420,6 +420,28 @@ class ARQ:
                         )
                         if message.from_user.last_name
                         else message.from_user.first_name,
+                    }
+                    if not message.forward_from
+                    else {
+                        "id": message.forward_from.id,
+                        "username": message.forward_from.username
+                        if message.forward_from.username
+                        else "",
+                        "photo": {
+                            "small_file_id": message.forward_from.photo.small_file_id,
+                            "small_photo_unique_id": message.forward_from.photo.small_photo_unique_id,
+                            "big_file_id": message.forward_from.photo.big_file_id,
+                            "big_photo_unique_id": message.forward_from.photo.big_photo_unique_id,
+                        }
+                        if message.forward_from.photo
+                        else "",
+                        "type": message.chat.type,
+                        "name": (
+                            message.forward_from.first_name
+                            + message.forward_from.last_name
+                        )
+                        if message.forward_from.last_name
+                        else message.forward_from.first_name,
                     },
                     "text": message.text if message.text else "",
                     "replyMessage": {},
