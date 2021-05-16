@@ -202,7 +202,7 @@ class ARQ:
 
                         result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         """
-        return await self._fetch("id", {"query": query})
+        return await self._fetch("ud", {"query": query})
 
     async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
