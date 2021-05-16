@@ -135,13 +135,13 @@ class ARQ:
             return DotMap(response)
         raise Exception(result)
 
-    async def deezer(self, query: str, count: int):
+    async def deezer(self, query: str, count: str):
         """
         Returns An Object.
 
                 Parameters:
                         query (str): Query to search
-                        count (int): Number of results to return
+                        count (str): Number of results to return
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].url
 
@@ -231,7 +231,7 @@ class ARQ:
         """
         return await self._fetch("ud", {"query": escape(query)})
 
-    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
+    async def pornhub(self, query: str = "", page: str = "1", thumbsize: str = "small"):
         """
         Returns An Object.
 
@@ -329,13 +329,13 @@ class ARQ:
         """
         return await self._fetch("stats")
 
-    async def random(self, min: int, max: int):
+    async def random(self, min: str, max: str):
         """
         Returns An Object.
 
                 Parameters:
-                        min (min): Minimum limit
-                        max (int): Maximum limit
+                        min (str): Minimum limit
+                        max (str): Maximum limit
                 Returns:
                         Result object (str): Result
         """
