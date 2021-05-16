@@ -65,6 +65,7 @@ print(help(ARQ.deezer))
 14. Generate "Truly" Random Numbers Using Atmospheric Noise
 15. Proxy Scraper
 16. The Movie Database [TMDB]
+17. Quotly [TELEGRAM]
 
 ## Note
 

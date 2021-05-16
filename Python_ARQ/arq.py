@@ -1,3 +1,4 @@
+from pyrogram.types import Message
 from urllib.parse import urlencode
 from html import escape
 import aiohttp
@@ -12,8 +13,8 @@ class ARQ:
 
     Parameters
     ___________
-        ARQ_API (``str``):
-            Pass ARQ_API_BASE_URL as argument
+        ARQ_API (URL: str, API_KEY: str):
+            Pass ARQ_API_BASE_URL and ARQ_API_KEY as argument
 
     Methods
     -------
@@ -83,6 +84,10 @@ class ARQ:
     tmdb(query: str = "")
         Search Something on TMDB
             Returns result object which you can access with dot notation.
+
+    quotly(messages: [Message])
+        Generate stickers from telegram message.
+            Returns base64 of the image sticker.
     """
 
     def __init__(self, api_url: str, api_key: str):
@@ -94,6 +99,24 @@ class ARQ:
             async with session.get(
                 f"{self.api_url}/{route}?{urlencode(params)}",
                 headers={"X-API-KEY": self.api_key},
+            ) as resp:
+                if resp.status in (
+                    401,
+                    403,
+                ):
+                    raise Exception("Invalid API key")
+                response = await resp.json()
+        ok, result = response
+        if ok:
+            return DotMap(response)
+        raise Exception(result)
+
+    async def _post(self, route, payload={}):
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{self.api_url}/{route}",
+                headers={"X-API-KEY": self.api_key},
+                data=payload,
             ) as resp:
                 if resp.status in (
                     401,
@@ -216,7 +239,8 @@ class ARQ:
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
         return await self._fetch(
-            "ph", {"query": escape(query), "page": escape(page), "thumbsize": escape(thumbsize)}
+            "ph", {"query": escape(query), "page": escape(
+                page), "thumbsize": escape(thumbsize)}
         )
 
     async def phdl(self, url: str):
@@ -330,3 +354,54 @@ class ARQ:
                         results.id | .title | .overview | .rating | .releaseDate | .genre | .backdrop | .poster
         """
         return await self._fetch("tmdb", {"query": escape(query)})
+
+    async def quotly(self, messages: [Message]):
+        """
+        Returns An Object.
+
+                Parameters:
+                        messages ([Message]): Generate quotly stickers.
+                Returns:
+                        Result object (str): Results which you can access with dot notation
+
+                        results
+        """
+        payload = {
+            "type": "quote",
+            "format": "png",
+            "backgroundColor": "#1b1429",
+            "messages": [
+                {
+                    "entities": [
+                        {
+                            "type": entity.type,
+                            "offset": entity.offset,
+                            "length": entity.length,
+                        } for entity in message.entities
+                    ] if message.entities else [],
+                    "chatId": message.from_user.id,
+                    "avatar": True,
+                    "from": {
+                        "id": message.from_user.id,
+                        "username": message.from_user.username
+                        if message.from_user.username
+                        else "",
+                        "photo": {
+                            "small_file_id": message.photo.small_file_id,
+                            "small_photo_unique_id": message.photo.small_photo_unique_id,
+                            "big_file_id": message.photo.big_file_id,
+                            "big_photo_unique_id":  message.photo.big_photo_unique_id
+                        } if message.photo else "",
+                        "type": message.chat.type,
+                        "name": (message.from_user.first_name + message.from_user.last_name)
+                        if message.from_user.last_name
+                        else message.from_user.first_name,
+                    },
+                    "text": message.text if message.text else "",
+                    "replyMessage": {},
+                }
+                for message in messages
+            ],
+        }
+
+        return await self._post("quotly", payload)
