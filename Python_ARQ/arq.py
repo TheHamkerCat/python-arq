@@ -1,5 +1,5 @@
 from urllib.parse import urlencode
-
+from html import escape
 import aiohttp
 from dotmap import DotMap
 
@@ -119,7 +119,7 @@ class ARQ:
                         result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
 
         """
-        return await self._fetch("deezer", {"query": query, "count": count})
+        return await self._fetch("deezer", {"query": escape(query), "count": escape(count)})
 
     async def torrent(self, query: str):
         """
@@ -132,7 +132,7 @@ class ARQ:
 
                         result[result_number].name | .uploaded | .size | .seeds | .leechs | .magnet
         """
-        return await self._fetch("torrent", {"query": query})
+        return await self._fetch("torrent", {"query": escape(query)})
 
     async def saavn(self, query: str):
         """
@@ -145,7 +145,7 @@ class ARQ:
 
                         result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         """
-        return await self._fetch("saavn", {"query": query})
+        return await self._fetch("saavn", {"query": escape(query)})
 
     async def youtube(self, query: str):
         """
@@ -159,7 +159,7 @@ class ARQ:
 
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
-        return await self._fetch("youtube", {"query": query})
+        return await self._fetch("youtube", {"query": escape(query)})
 
     async def wall(self, query: str):
         """
@@ -172,7 +172,7 @@ class ARQ:
 
                         result[result_number].id | .width | .height | .file_type | .file_size | .url_image | .url_thumb | .url_page
         """
-        return await self._fetch("wall", {"query": query})
+        return await self._fetch("wall", {"query": escape(query)})
 
     async def reddit(self, query: str):
         """
@@ -185,7 +185,7 @@ class ARQ:
 
                         result.postLink | .subreddit | .title | .url | .nsfw | .spoiler | .author | .ups | .preview
         """
-        return await self._fetch("reddit", {"query": query})
+        return await self._fetch("reddit", {"query": escape(query)})
 
     async def urbandict(self, query: str):
         """
@@ -198,7 +198,7 @@ class ARQ:
 
                         result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         """
-        return await self._fetch("ud", {"query": query})
+        return await self._fetch("ud", {"query": escape(query)})
 
     async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
@@ -216,7 +216,7 @@ class ARQ:
                         result[result_number].id | .title | .duration | .views | .rating | .url | .category | .thumbnails
         """
         return await self._fetch(
-            "ph", {"query": query, "page": page, "thumbsize": thumbsize}
+            "ph", {"query": escape(query), "page": escape(page), "thumbsize": escape(thumbsize)}
         )
 
     async def phdl(self, url: str):
@@ -228,7 +228,7 @@ class ARQ:
                 Returns:
                         result object (str): Result
         """
-        return await self._fetch("phdl", {"url": url})
+        return await self._fetch("phdl", {"url": escape(url)})
 
     async def luna(self, query: str):
         """
@@ -239,7 +239,7 @@ class ARQ:
                 Returns:
                         result object (str): Result
         """
-        return await self._fetch("luna", {"query": query})
+        return await self._fetch("luna", {"query": escape(query)})
 
     async def lyrics(self, query: str):
         """
@@ -252,7 +252,7 @@ class ARQ:
 
                         results.lyrics
         """
-        return await self._fetch("lyrics", {"query": query})
+        return await self._fetch("lyrics", {"query": escape(query)})
 
     async def wiki(self, query: str):
         """
@@ -265,7 +265,7 @@ class ARQ:
 
                         results.title | .answer
         """
-        return await self._fetch("wiki", {"query": query})
+        return await self._fetch("wiki", {"query": escape(query)})
 
     async def nsfw_scan(self, url: str):
         """
@@ -278,7 +278,7 @@ class ARQ:
 
                         results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
-        return await self._fetch("nsfw_scan", {"url": url})
+        return await self._fetch("nsfw_scan", {"url": escape(url)})
 
     async def stats(self):
         """
@@ -303,7 +303,7 @@ class ARQ:
                 Returns:
                         Result object (str): Result
         """
-        return await self._fetch("random", {"min": min, "max": max})
+        return await self._fetch("random", {"min": escape(min), "max": escape(max)})
 
     async def proxy(self):
         """
@@ -329,4 +329,4 @@ class ARQ:
 
                         results.id | .title | .overview | .rating | .releaseDate | .genre | .backdrop | .poster
         """
-        return await self._fetch("tmdb", {"query": query})
+        return await self._fetch("tmdb", {"query": escape(query)})
