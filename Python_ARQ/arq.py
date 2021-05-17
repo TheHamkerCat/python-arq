@@ -381,6 +381,12 @@ class ARQ:
 
                         results
         """
+        def getName(from_user):
+            first_name = from_user.first_name
+            last_name = from_user.last_name if from_user.last_name else ""
+            name = first_name + last_name
+            return name
+
         payload = {
             "type": "quote",
             "format": "png",
@@ -415,11 +421,7 @@ class ARQ:
                         if message.from_user.photo
                         else "",
                         "type": message.chat.type,
-                        "name": (
-                            message.from_user.first_name + message.from_user.last_name
-                        )
-                        if message.from_user.last_name
-                        else message.from_user.first_name,
+                        "name": getName(message.from_user),
                     }
                     if not message.forward_from
                     else {
@@ -436,15 +438,14 @@ class ARQ:
                         if message.forward_from.photo
                         else "",
                         "type": message.chat.type,
-                        "name": (
-                            message.forward_from.first_name
-                            + message.forward_from.last_name
-                        )
-                        if message.forward_from.last_name
-                        else message.forward_from.first_name,
+                        "name": getName(message.forward_from),
                     },
                     "text": message.text if message.text else "",
-                    "replyMessage": {},
+                    "replyMessage": ({
+                        "name": getName(message.reply_to_message.from_user),
+                        "text": message.reply_to_message.text,
+                        "chatId": message.reply_to_message.from_user.id
+                        } if message.reply_to_message else {}) if len(messages) == 1 else {},
                 }
                 for message in messages
             ],
