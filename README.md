@@ -52,6 +52,7 @@ print(help(ARQ.deezer))
 1. Deezer
 2. Jiosaavn
 3. Youtube
+4. YoutubeDL
 4. PronHub
 5. Reddit
 6. Torrent
@@ -66,6 +67,7 @@ print(help(ARQ.deezer))
 15. Proxy Scraper
 16. The Movie Database [TMDB]
 17. Quotly [TELEGRAM]
+18. Translate
 
 ## Note
 

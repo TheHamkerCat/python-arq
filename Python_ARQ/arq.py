@@ -37,6 +37,10 @@ class ARQ:
         Search on youtube.
             Returns result object which you can access with dot notation.
 
+    ytdl(url="https://www.youtube.com/watch?v=IO9XlQrEt2Y"):
+        Download a youtube video.
+            Returns result object which you can access with dot notation.
+
     wall(query="cyberpunk"):
         Returns result object which you can access with dot notation.
 
@@ -91,6 +95,10 @@ class ARQ:
     quotly(messages: [Message])
         Generate stickers from telegram message.
             Returns base64 of the image sticker.
+
+    translate(text: str, destLangCode: str = "en")
+        Translate some text.
+            returns result object.
     """
 
     def __init__(self, api_url: str, api_key: str):
@@ -186,13 +194,25 @@ class ARQ:
 
                 Parameters:
                         query (str): Query to search
-                        limit (int): Number of results to return
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
 
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
         return await self._fetch("youtube", {"query": query})
+
+    async def ytdl(self, url: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        url (str): Youtube video url
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].id | .thumbnail | .title | .video
+        """
+        return await self._fetch("ytdl", {"url": url})
 
     async def wall(self, query: str):
         """
@@ -233,7 +253,9 @@ class ARQ:
         """
         return await self._fetch("ud", {"query": query})
 
-    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
+    async def pornhub(
+        self, query: str = "", page: int = 1, thumbsize: str = "small"
+    ):
         """
         Returns An Object.
 
@@ -381,6 +403,7 @@ class ARQ:
 
                         results
         """
+
         def getName(from_user):
             first_name = from_user.first_name
             last_name = from_user.last_name if from_user.last_name else ""
@@ -441,14 +464,38 @@ class ARQ:
                         "name": getName(message.forward_from),
                     },
                     "text": message.text if message.text else "",
-                    "replyMessage": ({
-                        "name": getName(message.reply_to_message.from_user),
-                        "text": message.reply_to_message.text,
-                        "chatId": message.reply_to_message.from_user.id
-                        } if message.reply_to_message else {}) if len(messages) == 1 else {},
+                    "replyMessage": (
+                        {
+                            "name": getName(
+                                message.reply_to_message.from_user
+                            ),
+                            "text": message.reply_to_message.text,
+                            "chatId": message.reply_to_message.from_user.id,
+                        }
+                        if message.reply_to_message
+                        else {}
+                    )
+                    if len(messages) == 1
+                    else {},
                 }
                 for message in messages
             ],
         }
 
         return await self._post("quotly", payload)
+
+    async def translate(self, text: str, destLangCode: str = "en"):
+        """
+        Returns An Object.
+
+                Parameters:
+                        text (str): Text to translate
+                        destLangCode (str): Language code of destination language.
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].text | .src | .dest
+        """
+        return await self._fetch(
+            "translate", {"text": text, "destLangCode": destLangCode}
+        )
