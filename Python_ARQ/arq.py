@@ -3,7 +3,7 @@ from html import escape
 from re import sub
 from urllib.parse import urlencode
 
-import aiohttp
+from aiohttp import ClientSession
 from dotmap import DotMap
 from pyrogram.types import Message
 
@@ -105,40 +105,47 @@ class ARQ:
         self.api_url = api_url[:-1] if api_url.endswith("/") else api_url
         self.api_key = api_key
 
+    session = None
+
+    async def getSession(self) -> ClientSession:
+        global session
+        if not self.session:
+            self.session = ClientSession()
+        return self.session
+
     async def _fetch(self, route, params={}):
         if params:
             for param in params:
                 params[param] = escape(str(params[param]))
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{self.api_url}/{route}?{urlencode(params)}",
-                headers={"X-API-KEY": self.api_key},
-            ) as resp:
-                if resp.status in (
-                    401,
-                    403,
-                ):
-                    raise Exception("Invalid API key")
-                response = await resp.json()
+        session: ClientSession = await self.getSession()
+        async with session.get(
+            f"{self.api_url}/{route}?{urlencode(params)}",
+            headers={"X-API-KEY": self.api_key},
+        ) as resp:
+            if resp.status in (
+                401,
+                403,
+            ):
+                raise Exception("Invalid API key, Get an api key from @ARQRobot")
+            response = await resp.json()
         ok, result = response
         if ok:
             return DotMap(response)
         raise Exception(result)
 
     async def _post(self, route, payload={}):
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{self.api_url}/{route}",
-                headers={"X-API-KEY": self.api_key},
-                params={"payload": str(payload)},
-            ) as resp:
-                if resp.status in (
-                    401,
-                    403,
-                ):
-                    raise Exception("Invalid API key")
-                response = await resp.json()
+        session: ClientSession = await getSession()
+        async with session.post(
+            f"{self.api_url}/{route}",
+            headers={"X-API-KEY": self.api_key},
+            params={"payload": str(payload)},
+        ) as resp:
+            if resp.status in (
+                401,
+                403,
+            ):
+                raise Exception("Invalid API key, Get an api key from @ARQRobot")
+            response = await resp.json()
         ok, result = response
         if ok:
             response["result"] = b64decode(
@@ -253,9 +260,7 @@ class ARQ:
         """
         return await self._fetch("ud", {"query": query})
 
-    async def pornhub(
-        self, query: str = "", page: int = 1, thumbsize: str = "small"
-    ):
+    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
         Returns An Object.
 
@@ -466,9 +471,7 @@ class ARQ:
                     "text": message.text if message.text else "",
                     "replyMessage": (
                         {
-                            "name": getName(
-                                message.reply_to_message.from_user
-                            ),
+                            "name": getName(message.reply_to_message.from_user),
                             "text": message.reply_to_message.text,
                             "chatId": message.reply_to_message.from_user.id,
                         }
@@ -498,4 +501,20 @@ class ARQ:
         """
         return await self._fetch(
             "translate", {"text": text, "destLangCode": destLangCode}
+        )
+    
+    async def pypi(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Exact package name.
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].name | .version | .license | .description | .size | .author | .authorEmail |  .homepage 
+                            .keywords | .requirements | .minPyVersion | .bugTrackURL | .docsURl | .pypiURL | .releaseURl | .projectURLS
+        """
+        return await self._fetch(
+            "pypi", {"query": query}
         )
