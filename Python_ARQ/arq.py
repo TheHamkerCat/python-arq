@@ -88,7 +88,7 @@ class ARQ:
         Generate a proxy, sock5.
             Returns result object which you can access with dot notation.
 
-    tmdb(query: str = "")
+    tmdb(query: str = "", tmdbID: int = 0)
         Search Something on TMDB
             Returns result object which you can access with dot notation.
 
@@ -134,7 +134,7 @@ class ARQ:
         raise Exception(result)
 
     async def _post(self, route, payload={}):
-        session: ClientSession = await getSession()
+        session: ClientSession = await self.getSession()
         async with session.post(
             f"{self.api_url}/{route}",
             headers={"X-API-KEY": self.api_key},
@@ -266,10 +266,10 @@ class ARQ:
 
                 Parameters:
 
-                        - query: Search query, optional, defaults to ""
-                        - page: Page number, optional, defaults to 1
+                        - query: Search query, optional, defaults to "" [OPTIONAL]
+                        - page: Page number, optional, defaults to 1 [OPTIONAL]
                         - thumbsize: Size of the thumbnail, optional,
-                          defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd
+                          defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
 
@@ -301,7 +301,7 @@ class ARQ:
 
                 Parameters:
                         query (str): Query to compute
-                        id (int): Unique user_id.
+                        id (int): Unique user_id. [OPTIONAL]
                 Returns:
                         result object (str): Result
         """
@@ -384,18 +384,19 @@ class ARQ:
         """
         return await self._fetch("proxy")
 
-    async def tmdb(self, query: str = ""):
+    async def tmdb(self, query: str = "", tmdbID: int = 0):
         """
         Returns An Object.
 
                 Parameters:
-                        query (str): Search something on TMDB
+                        query (str): Name of series/movie [OPTIONAL]
+                        tmdbID (int): TMDB ID of series/movie [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation
 
                         results.id | .title | .overview | .rating | .releaseDate | .genre | .backdrop | .poster
         """
-        return await self._fetch("tmdb", {"query": query})
+        return await self._fetch("tmdb", {"query": query, "tmdbID": tmdbID})
 
     async def quotly(self, messages: [Message]):
         """
@@ -493,7 +494,7 @@ class ARQ:
 
                 Parameters:
                         text (str): Text to translate
-                        destLangCode (str): Language code of destination language.
+                        destLangCode (str): Language code of destination language. [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
 
