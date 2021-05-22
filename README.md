@@ -73,4 +73,4 @@ print(help(ARQ.deezer))
 ## Note
 
 1. I'll add more features soon.
-2. If you're stucked somewhere, [Pathetic Programmers](https://t.me/PatheticProgrammers) are there to help.
+2. If you're stuck somewhere, [Pathetic Programmers](https://t.me/PatheticProgrammers) are there to help.

@@ -164,7 +164,8 @@ class ARQ:
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].url
 
-                        result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
+                        result[result_number].title | .id | .source | .duration | .thumbnail | .thumbnailBig |.artist 
+                            .artistPictures | .url
 
         """
         return await self._fetch("deezer", {"query": query, "count": count})
