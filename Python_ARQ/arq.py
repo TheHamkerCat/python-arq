@@ -133,7 +133,9 @@ class Arq:
                 params=params,
             )
             if resp.status_code in (401, 403):
-                raise InvalidApiKey("Invalid API key, Get an api key from @ARQRobot")
+                raise InvalidApiKey(
+                    "Invalid API key, Get an api key from @ARQRobot"
+                )
         response = resp.json()
         if response.get("ok"):
             return DotMap(response)
@@ -147,7 +149,9 @@ class Arq:
                 params={"payload": json.dumps(payload)},
             )
             if resp.status in (401, 403):
-                raise InvalidApiKey("Invalid API key, Get an api key from @ARQRobot")
+                raise InvalidApiKey(
+                    "Invalid API key, Get an api key from @ARQRobot"
+                )
         response = await resp.json()
         if response.get("ok"):
             response["result"] = b64decode(
@@ -263,7 +267,9 @@ class Arq:
         """
         return await self._fetch("ud", query=query)
 
-    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
+    async def pornhub(
+        self, query: str = "", page: int = 1, thumbsize: str = "small"
+    ):
         """
         Returns An Object.
 
@@ -465,7 +471,9 @@ class Arq:
                     "text": message.text if message.text else "",
                     "replyMessage": (
                         {
-                            "name": _get_name(message.reply_to_message.from_user),
+                            "name": _get_name(
+                                message.reply_to_message.from_user
+                            ),
                             "text": message.reply_to_message.text,
                             "chatId": message.reply_to_message.from_user.id,
                         }
@@ -493,7 +501,9 @@ class Arq:
 
                         result[result_number].text | .src | .dest
         """
-        return await self._fetch("translate", text=text, destLangCode=destLangCode)
+        return await self._fetch(
+            "translate", text=text, destLangCode=destLangCode
+        )
 
     async def pypi(self, query: str):
         """
@@ -510,5 +520,5 @@ class Arq:
         return await self._fetch("pypi", query=query)
 
 
-ARQ = Arq
 # Backwards compatibility
+ARQ = Arq
