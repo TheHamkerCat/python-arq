@@ -1,14 +1,33 @@
+import json
+import re
 from base64 import b64decode
-from html import escape
 from re import sub
-from urllib.parse import urlencode
 
-import aiohttp
 from dotmap import DotMap
-from pyrogram.types import Message
+from httpx import AsyncClient
+from pyrogram.types import Message, User
 
 
-class ARQ:
+# https://stackoverflow.com/a/55766564/13673785
+def _format_url(url):
+    if not re.match("(?:http|https)://", url):
+        return "https://{}".format(url)
+    return url
+
+
+def _get_name(from_user: User) -> str:
+    return f"{from_user.first_name} {from_user.last_name or ''}".rstrip()
+
+
+class InvalidApiKey(Exception):
+    pass
+
+
+class GenericApiError(Exception):
+    pass
+
+
+class Arq:
     """
     Arq class to access all the endpoints of api.
 
@@ -85,10 +104,10 @@ class ARQ:
             Returns result object which you can access with dot notation.
 
     proxy()
-        Generate a proxy, sock5.
+        Generate a proxy, socks5.
             Returns result object which you can access with dot notation.
 
-    tmdb(query: str = "")
+    tmdb(query: str = "", tmdbID: int = 0)
         Search Something on TMDB
             Returns result object which you can access with dot notation.
 
@@ -101,51 +120,41 @@ class ARQ:
             returns result object.
     """
 
-    def __init__(self, api_url: str, api_key: str):
-        self.api_url = api_url[:-1] if api_url.endswith("/") else api_url
+    def __init__(self, api_url: str, api_key: str, **options):
+        self.api_url = _format_url(api_url.strip(" /"))
         self.api_key = api_key
+        self.session = AsyncClient(**options)
 
-    async def _fetch(self, route, params={}):
-        if params:
-            for param in params:
-                params[param] = escape(str(params[param]))
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{self.api_url}/{route}?{urlencode(params)}",
-                headers={"X-API-KEY": self.api_key},
-            ) as resp:
-                if resp.status in (
-                    401,
-                    403,
-                ):
-                    raise Exception("Invalid API key")
-                response = await resp.json()
-        ok, result = response
-        if ok:
-            return DotMap(response)
-        raise Exception(result)
-
-    async def _post(self, route, payload={}):
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+    async def _fetch(self, route, **params):
+        async with self.session as s:
+            resp = await s.get(
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
-                params={"payload": str(payload)},
-            ) as resp:
-                if resp.status in (
-                    401,
-                    403,
-                ):
-                    raise Exception("Invalid API key")
-                response = await resp.json()
-        ok, result = response
-        if ok:
+                params=params,
+            )
+            if resp.status_code in (401, 403):
+                raise InvalidApiKey("Invalid API key, Get an api key from @ARQRobot")
+        response = resp.json()
+        if response.get("ok"):
+            return DotMap(response)
+        raise GenericApiError(response)
+
+    async def _post(self, route, **payload):
+        async with self.session as s:
+            resp = await s.post(
+                f"{self.api_url}/{route}",
+                headers={"X-API-KEY": self.api_key},
+                params={"payload": json.dumps(payload)},
+            )
+            if resp.status in (401, 403):
+                raise InvalidApiKey("Invalid API key, Get an api key from @ARQRobot")
+        response = await resp.json()
+        if response.get("ok"):
             response["result"] = b64decode(
                 sub("data:image/png;base64", "", response["result"])
             )
             return DotMap(response)
-        raise Exception(result)
+        raise GenericApiError(response)
 
     async def deezer(self, query: str, count: int):
         """
@@ -157,10 +166,11 @@ class ARQ:
                 Returns:
                         result object (str): Results which you can access with dot notation, Ex - results[result_number].url
 
-                        result[result_number].title | .id | .source | .duration | .thumbnail | .artist | .url
+                        result[result_number].title | .id | .source | .duration | .thumbnail | .thumbnailBig |.artist
+                            .artistPictures | .url
 
         """
-        return await self._fetch("deezer", {"query": query, "count": count})
+        return await self._fetch("deezer", query=query, count=count)
 
     async def torrent(self, query: str):
         """
@@ -173,7 +183,7 @@ class ARQ:
 
                         result[result_number].name | .uploaded | .size | .seeds | .leechs | .magnet
         """
-        return await self._fetch("torrent", {"query": query})
+        return await self._fetch("torrent", query=query)
 
     async def saavn(self, query: str):
         """
@@ -186,7 +196,7 @@ class ARQ:
 
                         result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         """
-        return await self._fetch("saavn", {"query": query})
+        return await self._fetch("saavn", query=query)
 
     async def youtube(self, query: str):
         """
@@ -199,7 +209,7 @@ class ARQ:
 
                         result[result_number].id | .thumbnails | .title | .long_desc | .channel | .duration | .views | .publish_time | .url_suffix
         """
-        return await self._fetch("youtube", {"query": query})
+        return await self._fetch("youtube", query=query)
 
     async def ytdl(self, url: str):
         """
@@ -212,7 +222,7 @@ class ARQ:
 
                         result[result_number].id | .thumbnail | .title | .video
         """
-        return await self._fetch("ytdl", {"url": url})
+        return await self._fetch("ytdl", url=url)
 
     async def wall(self, query: str):
         """
@@ -225,7 +235,7 @@ class ARQ:
 
                         result[result_number].id | .width | .height | .file_type | .file_size | .url_image | .url_thumb | .url_page
         """
-        return await self._fetch("wall", {"query": query})
+        return await self._fetch("wall", query=query)
 
     async def reddit(self, query: str):
         """
@@ -238,7 +248,7 @@ class ARQ:
 
                         result.postLink | .subreddit | .title | .url | .nsfw | .spoiler | .author | .ups | .preview
         """
-        return await self._fetch("reddit", {"query": query})
+        return await self._fetch("reddit", query=query)
 
     async def urbandict(self, query: str):
         """
@@ -251,20 +261,18 @@ class ARQ:
 
                         result[result_number].definition | .permalink | .thumbs_up | .sound_urls | .author | .word | .defid | .example | .thumbs_down
         """
-        return await self._fetch("ud", {"query": query})
+        return await self._fetch("ud", query=query)
 
-    async def pornhub(
-        self, query: str = "", page: int = 1, thumbsize: str = "small"
-    ):
+    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
         Returns An Object.
 
                 Parameters:
 
-                        - query: Search query, optional, defaults to ""
-                        - page: Page number, optional, defaults to 1
+                        - query: Search query, optional, defaults to "" [OPTIONAL]
+                        - page: Page number, optional, defaults to 1 [OPTIONAL]
                         - thumbsize: Size of the thumbnail, optional,
-                          defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd
+                          defaults to "small", possible values are small, medium, large, small_hd, medium_hd, large_hd [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].title
 
@@ -272,11 +280,9 @@ class ARQ:
         """
         return await self._fetch(
             "ph",
-            {
-                "query": query,
-                "page": page,
-                "thumbsize": thumbsize,
-            },
+            query=query,
+            page=page,
+            thumbsize=thumbsize,
         )
 
     async def phdl(self, url: str):
@@ -288,7 +294,7 @@ class ARQ:
                 Returns:
                         result object (str): Result
         """
-        return await self._fetch("phdl", {"url": url})
+        return await self._fetch("phdl", url=url)
 
     async def luna(self, query: str, id: int = 0):
         """
@@ -296,11 +302,11 @@ class ARQ:
 
                 Parameters:
                         query (str): Query to compute
-                        id (int): Unique user_id.
+                        id (int): Unique user_id. [OPTIONAL]
                 Returns:
                         result object (str): Result
         """
-        return await self._fetch("luna", {"query": query, "id": id})
+        return await self._fetch("luna", query=query, id=id)
 
     async def lyrics(self, query: str):
         """
@@ -313,7 +319,7 @@ class ARQ:
 
                         results.lyrics
         """
-        return await self._fetch("lyrics", {"query": query})
+        return await self._fetch("lyrics", query=query)
 
     async def wiki(self, query: str):
         """
@@ -326,7 +332,7 @@ class ARQ:
 
                         results.title | .answer
         """
-        return await self._fetch("wiki", {"query": query})
+        return await self._fetch("wiki", query=query)
 
     async def nsfw_scan(self, url: str):
         """
@@ -339,14 +345,12 @@ class ARQ:
 
                         results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
-        return await self._fetch("nsfw_scan", {"url": url})
+        return await self._fetch("nsfw_scan", url=url)
 
     async def stats(self):
         """
         Returns An Object.
 
-                Parameters:
-                        None
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results.uptime
 
@@ -364,14 +368,12 @@ class ARQ:
                 Returns:
                         Result object (str): Result
         """
-        return await self._fetch("random", {"min": min, "max": max})
+        return await self._fetch("random", min=min, max=max)
 
     async def proxy(self):
         """
         Returns An Object.
 
-                Parameters:
-                        None
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results.uptime
 
@@ -379,18 +381,19 @@ class ARQ:
         """
         return await self._fetch("proxy")
 
-    async def tmdb(self, query: str = ""):
+    async def tmdb(self, query: str = "", tmdbID: int = 0):
         """
         Returns An Object.
 
                 Parameters:
-                        query (str): Search something on TMDB
+                        query (str): Name of series/movie [OPTIONAL]
+                        tmdbID (int): TMDB ID of series/movie [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation
 
                         results.id | .title | .overview | .rating | .releaseDate | .genre | .backdrop | .poster
         """
-        return await self._fetch("tmdb", {"query": query})
+        return await self._fetch("tmdb", query=query, tmdbID=tmdbID)
 
     async def quotly(self, messages: [Message]):
         """
@@ -403,12 +406,8 @@ class ARQ:
 
                         results
         """
-
-        def getName(from_user):
-            first_name = from_user.first_name
-            last_name = from_user.last_name if from_user.last_name else ""
-            name = first_name + last_name
-            return name
+        if not isinstance(messages, list):
+            messages = [messages]
 
         payload = {
             "type": "quote",
@@ -444,7 +443,7 @@ class ARQ:
                         if message.from_user.photo
                         else "",
                         "type": message.chat.type,
-                        "name": getName(message.from_user),
+                        "name": _get_name(message.from_user),
                     }
                     if not message.forward_from
                     else {
@@ -461,14 +460,12 @@ class ARQ:
                         if message.forward_from.photo
                         else "",
                         "type": message.chat.type,
-                        "name": getName(message.forward_from),
+                        "name": _get_name(message.forward_from),
                     },
                     "text": message.text if message.text else "",
                     "replyMessage": (
                         {
-                            "name": getName(
-                                message.reply_to_message.from_user
-                            ),
+                            "name": _get_name(message.reply_to_message.from_user),
                             "text": message.reply_to_message.text,
                             "chatId": message.reply_to_message.from_user.id,
                         }
@@ -482,7 +479,7 @@ class ARQ:
             ],
         }
 
-        return await self._post("quotly", payload)
+        return await self._post("quotly", payload=payload)
 
     async def translate(self, text: str, destLangCode: str = "en"):
         """
@@ -490,12 +487,28 @@ class ARQ:
 
                 Parameters:
                         text (str): Text to translate
-                        destLangCode (str): Language code of destination language.
+                        destLangCode (str): Language code of destination language. [OPTIONAL]
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
 
                         result[result_number].text | .src | .dest
         """
-        return await self._fetch(
-            "translate", {"text": text, "destLangCode": destLangCode}
-        )
+        return await self._fetch("translate", text=text, destLangCode=destLangCode)
+
+    async def pypi(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Exact package name.
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].name | .version | .license | .description | .size | .author | .authorEmail |  .homepage
+                            .keywords | .requirements | .minPyVersion | .bugTrackURL | .docsURl | .pypiURL | .releaseURl | .projectURLS
+        """
+        return await self._fetch("pypi", query=query)
+
+
+ARQ = Arq
+# Backwards compatibility

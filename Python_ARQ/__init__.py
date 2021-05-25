@@ -1,3 +1,3 @@
-from .arq import ARQ
+from .arq import Arq, ARQ, InvalidApiKey, GenericApiError
 
-__all__ = ["ARQ"]
+__all__ = ["Arq", "ARQ", "InvalidApiKey", "GenericApiError"]

@@ -22,17 +22,20 @@ For Example, to get a song link from deezer, you can do this
 
 ```py
 import asyncio
-from Python_ARQ import ARQ
+from python_arq import ARQ
 
 arq = ARQ(api_url, api_key)
 
+
 async def func(query: str):
- song = await arq.deezer(query, 1)
- return song[0].url
+    song = await arq.deezer(query, 1)
+    return song[0].url
+
 
 async def main():
- output = await func("Never gonna give you up")
- print(output)
+    output = await func("Never gonna give you up")
+    print(output)
+
 
 asyncio.run(main())
 ```
@@ -42,7 +45,7 @@ asyncio.run(main())
 There is no documentation as of now, however, you can take help from the docstrings this way:
 
 ```py
-from Python_ARQ import ARQ
+from python_arq import ARQ
 
 print(help(ARQ.deezer))
 ```
@@ -68,8 +71,9 @@ print(help(ARQ.deezer))
 16. The Movie Database [TMDB]
 17. Quotly [TELEGRAM]
 18. Translate
+19. PypiPackageSearch
 
 ## Note
 
 1. I'll add more features soon.
-2. If you're stucked somewhere, [Pathetic Programmers](https://t.me/PatheticProgrammers) are there to help.
+2. If you're stuck somewhere, [Pathetic Programmers](https://t.me/PatheticProgrammers) are there to help.

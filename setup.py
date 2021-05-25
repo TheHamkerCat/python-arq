@@ -1,28 +1,22 @@
-import requests
-from setuptools import setup
+import setuptools
 
-readme = requests.get(
-    "https://raw.githubusercontent.com/thehamkercat/Python_ARQ/master/README.md"
-).text
+with open("README.md", encoding="utf8") as readme, open(
+    "requirements.txt", encoding="utf8"
+) as requirements:
+    long_description = readme.read()
+    requires = requirements.read().splitlines(keepends=False)
 
-requirements = requests.get(
-    "https://raw.githubusercontent.com/thehamkercat/Python_ARQ/master/requirements.txt"
-).text
-
-requires = requirements.splitlines()
-
-setup(
-    name="Python_ARQ",
-    packages=["Python_ARQ"],
-    version="3.0.5",
+setuptools.setup(
+    name="python_arq",
+    packages=setuptools.find_packages(),
+    version="4.0",
     license="MIT",
-    description="Asynchronous Python Wrapper For A.R.Q API. ",
-    long_description=readme,
+    description="Asynchronous Python Wrapper For A.R.Q API.",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     author="TheHamkerCat",
     author_email="thehamkercat@gmail.com",
     url="https://github.com/thehamkercat/Python_ARQ",
-    download_url="",
     keywords=["API", "ARQ_API", "Universal API", "Python-ARQ"],
     install_requires=requires,
     classifiers=[

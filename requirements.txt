@@ -1,2 +1,3 @@
-aiohttp
+pyrogram
 dotmap
+httpx
