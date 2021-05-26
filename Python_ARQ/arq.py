@@ -140,11 +140,11 @@ class Arq:
             headers={"X-API-KEY": self.api_key},
             params={"payload": str(payload)},
         ) as resp:
-            if resp.status_code in (401, 403):
+            if resp.status in (401, 403):
                 raise InvalidApiKey(
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
-        response = await resp.json()
+            response = await resp.json()
         if response.get("ok"):
             response["result"] = b64decode(
                 sub("data:image/png;base64", "", response["result"])
