@@ -99,10 +99,6 @@ class Arq:
         Get statistics of ARQ server.
             Returns result object which you can access with dot notation.
 
-    random(min=0, max=1000)
-        Generate a true random number using atmospheric noise.
-            Returns result object which you can access with dot notation.
-
     proxy()
         Generate a proxy, socks5.
             Returns result object which you can access with dot notation.
@@ -137,28 +133,26 @@ class Arq:
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
         response = resp.json()
-        if response.get("ok"):
-            return DotMap(response)
-        raise GenericApiError(response)
+        return DotMap(response)
 
-    async def _post(self, route, **payload):
+    async def _post(self, route, payload):
         async with self.session as s:
             resp = await s.post(
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
-                params={"payload": json.dumps(payload)},
+                params={"payload": str(payload)},
             )
-            if resp.status in (401, 403):
+            if resp.status_code in (401, 403):
                 raise InvalidApiKey(
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
-        response = await resp.json()
+        response = resp.json()
         if response.get("ok"):
             response["result"] = b64decode(
                 sub("data:image/png;base64", "", response["result"])
             )
             return DotMap(response)
-        raise GenericApiError(response)
+        return DotMap(response)
 
     async def deezer(self, query: str, count: int):
         """
@@ -363,18 +357,6 @@ class Arq:
                         results.uptime | .requests | .cpu | .memory.server | .memory.api | .disk | .platform | .python
         """
         return await self._fetch("stats")
-
-    async def random(self, min: int, max: int):
-        """
-        Returns An Object.
-
-                Parameters:
-                        min (int): Minimum limit
-                        max (int): Maximum limit
-                Returns:
-                        Result object (str): Result
-        """
-        return await self._fetch("random", min=min, max=max)
 
     async def proxy(self):
         """
