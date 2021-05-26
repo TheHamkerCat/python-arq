@@ -21,20 +21,20 @@ $ pip install python-arq
 For Example, to get a song link from deezer, you can do this
 
 ```py
-import asyncio
+from asyncio import run
+from aiohttp import ClientSession
 from python_arq import ARQ
 
-arq = ARQ(api_url, api_key)
-
-
-async def func(query: str):
-    song = await arq.deezer(query, 1)
-    return song[0].url
+session = ClientSession()
+arq = ARQ(api_url, api_key, session)
 
 
 async def main():
-    output = await func("Never gonna give you up")
-    print(output)
+    results = await arq.deezer("Never gonna give you up", 1)
+    song = results.result[0]
+    title = song.title
+    link = song.url
+    print(link)
 
 
 asyncio.run(main())
@@ -66,12 +66,11 @@ print(help(ARQ.deezer))
 11. Wikipedia
 12. NSFW Image Classification
 13. Optical Character Recognition (OCR)
-14. Generate "Truly" Random Numbers Using Atmospheric Noise
-15. Proxy Scraper
-16. The Movie Database [TMDB]
-17. Quotly [TELEGRAM]
-18. Translate
-19. PypiPackageSearch
+14. Proxy Scraper
+15. The Movie Database [TMDB]
+16. Quotly [TELEGRAM]
+17. Translate
+18. PypiPackageSearch
 
 ## Note
 

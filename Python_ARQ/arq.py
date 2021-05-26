@@ -1,16 +1,14 @@
-import json
-import re
 from base64 import b64decode
-from re import sub
+from re import match, sub
 
+from aiohttp import ClientSession
 from dotmap import DotMap
-from httpx import AsyncClient
 from pyrogram.types import Message, User
 
 
 # https://stackoverflow.com/a/55766564/13673785
 def _format_url(url):
-    if not re.match("(?:http|https)://", url):
+    if not match("(?:http|https)://", url):
         return "https://{}".format(url)
     return url
 
@@ -116,37 +114,37 @@ class Arq:
             returns result object.
     """
 
-    def __init__(self, api_url: str, api_key: str, **options):
+    def __init__(
+        self, api_url: str, api_key: str, aiohttp_session: ClientSession
+    ):
         self.api_url = _format_url(api_url.strip(" /"))
         self.api_key = api_key
-        self.session = AsyncClient(**options)
+        self.session = aiohttp_session
 
     async def _fetch(self, route, **params):
-        async with self.session as s:
-            resp = await s.get(
-                f"{self.api_url}/{route}",
-                headers={"X-API-KEY": self.api_key},
-                params=params,
-            )
-            if resp.status_code in (401, 403):
+        async with self.session.get(
+            f"{self.api_url}/{route}",
+            headers={"X-API-KEY": self.api_key},
+            params=params,
+        ) as resp:
+            if resp.status in (401, 403):
                 raise InvalidApiKey(
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
-        response = resp.json()
+            response = await resp.json()
         return DotMap(response)
 
     async def _post(self, route, payload):
-        async with self.session as s:
-            resp = await s.post(
-                f"{self.api_url}/{route}",
-                headers={"X-API-KEY": self.api_key},
-                params={"payload": str(payload)},
-            )
+        async with self.session.post(
+            f"{self.api_url}/{route}",
+            headers={"X-API-KEY": self.api_key},
+            params={"payload": str(payload)},
+        ) as resp:
             if resp.status_code in (401, 403):
                 raise InvalidApiKey(
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
-        response = resp.json()
+        response = await resp.json()
         if response.get("ok"):
             response["result"] = b64decode(
                 sub("data:image/png;base64", "", response["result"])
