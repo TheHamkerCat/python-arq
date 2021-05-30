@@ -38,7 +38,7 @@ class Arq:
 
     Methods
     -------
-    deezer(query="never gonna give you up", limit=1):
+    deezer(query="never gonna give you up", count=1, format=3):
         Get songs from deezer.
             Returns result object with 'limit' number of result which you can use access dot notation.
 
@@ -152,21 +152,26 @@ class Arq:
             return DotMap(response)
         return DotMap(response)
 
-    async def deezer(self, query: str, count: int):
+    async def deezer(self, query: str, count: int = 1, format: int = 3):
         """
         Returns An Object.
 
                 Parameters:
-                        query (int): Query to search
+                        query (str): Query to search
                         count (int): Number of results to return
+                        format (int): Quality [Bitrate] of songs.
+                                      Available formats:  1 - MP3 128kbit,
+                                                          3 - MP3 320kbit,
+                                                          9 - Lossless(FLAC),
+                                      Defaults to 3, MP3 320Kbps.
                 Returns:
-                        result object (str): Results which you can access with dot notation, Ex - results[result_number].url
+                        results: Results which you can access with dot notation, Ex - results[result_number].url
 
                         result[result_number].title | .id | .source | .duration | .thumbnail | .thumbnailBig |.artist
                             .artistPictures | .url
 
         """
-        return await self._fetch("deezer", query=query, count=count)
+        return await self._fetch("deezer", query=query, count=count, format=format)
 
     async def torrent(self, query: str):
         """
