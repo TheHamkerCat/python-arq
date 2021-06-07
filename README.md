@@ -45,7 +45,7 @@ run(main())
 There is no documentation as of now, however, you can take help from the docstrings this way:
 
 ```py
-from python_arq import ARQ
+from Python_ARQ import ARQ
 
 print(help(ARQ.deezer))
 ```
