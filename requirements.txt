@@ -1,3 +1,4 @@
 pyrogram
 dotmap
 aiohttp
+aiofiles

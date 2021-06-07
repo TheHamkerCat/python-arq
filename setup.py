@@ -9,7 +9,7 @@ with open("README.md", encoding="utf8") as readme, open(
 setuptools.setup(
     name="python_arq",
     packages=setuptools.find_packages(),
-    version="4.6",
+    version="4.7",
     license="MIT",
     description="Asynchronous Python Wrapper For A.R.Q API.",
     long_description=long_description,

@@ -1,3 +1,5 @@
+import aiofiles
+
 from base64 import b64decode
 from re import match, sub
 
@@ -155,6 +157,22 @@ class Arq:
             )
             return DotMap(response)
         return DotMap(response)
+
+
+    async def _post_data(self, route, data):
+        async with self.session.post(
+            f"{self.api_url}/{route}",
+            headers={"X-API-KEY": self.api_key},
+            data=data,
+        ) as resp:
+            if resp.status in (401, 403):
+                raise InvalidApiKey(
+                    "Invalid API key, Get an api key from @ARQRobot"
+                )
+            response = await resp.json()
+        return DotMap(response)
+
+
 
     async def deezer(self, query: str, count: int = 1, format: int = 3):
         """
@@ -354,18 +372,25 @@ class Arq:
         """
         return await self._fetch("wiki", query=query)
 
-    async def nsfw_scan(self, url: str):
+    async def nsfw_scan(self, url: str = None, file: str = None):
         """
         Returns An Object.
 
                 Parameters:
-                        url (str): URL to scan
+                        url (str): URL to scan (Optional)
+                        file (str): File path of an image to scan. (Optional)
                 Returns:
                         Result object (str): Results which you can access with dot notation, Ex - results.data
 
                         results.data | results.data.drawings | results.data.hentai | .neutral | .sexy | .porn | .is_nsfw
         """
-        return await self._fetch("nsfw_scan", url=url)
+        if not file and not url:
+            raise Exception("PROVIDE FILE OR URL")
+        if not file:
+            return await self._fetch("nsfw_scan", url=url)
+        async with aiofiles.open(file, mode="rb") as f:
+            file = await f.read()
+        return await self._post_data("nsfw_scan", data={"file": file})
 
     async def stats(self):
         """
