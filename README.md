@@ -23,7 +23,7 @@ For Example, to get a song link from deezer, you can do this
 ```py
 from asyncio import run
 from aiohttp import ClientSession
-from python_arq import ARQ
+from Python_ARQ import ARQ
 
 session = ClientSession()
 arq = ARQ(api_url, api_key, session)
@@ -37,7 +37,7 @@ async def main():
     print(link)
 
 
-asyncio.run(main())
+run(main())
 ```
 
 ## Documentation
@@ -45,7 +45,7 @@ asyncio.run(main())
 There is no documentation as of now, however, you can take help from the docstrings this way:
 
 ```py
-from python_arq import ARQ
+from Python_ARQ import ARQ
 
 print(help(ARQ.deezer))
 ```
