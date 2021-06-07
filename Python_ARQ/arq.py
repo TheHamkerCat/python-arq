@@ -50,6 +50,10 @@ class Arq:
         Get songs from Saavn.
             Returns result object with 4-5 results which you can access with dot notation.
 
+    splaylist(url):
+        Get Saavn playlist songs.
+            Returns result object with an array of songs.
+
     youtube(query="carry minati"):
         Search on youtube.
             Returns result object which you can access with dot notation.
@@ -198,6 +202,19 @@ class Arq:
                         result[result_number].song | .album | .year | .singers | .image | .duration | .media_url
         """
         return await self._fetch("saavn", query=query)
+
+    async def splaylist(self, url: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        url (str): Saavn playlist url
+                Returns:
+                        Result object (str): Results which you can access with dot notation
+
+        """
+        return await self._fetch("splaylist", url=url)
+
 
     async def youtube(self, query: str):
         """
