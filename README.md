@@ -70,7 +70,8 @@ print(help(ARQ.deezer))
 15. The Movie Database [TMDB]
 16. Quotly [TELEGRAM]
 17. Translate
-18. PypiPackageSearch
+18. Pypi Package Search
+19. Image Search
 
 ## Note
 

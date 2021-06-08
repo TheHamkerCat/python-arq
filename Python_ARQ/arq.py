@@ -118,6 +118,9 @@ class Arq:
     translate(text: str, destLangCode: str = "en")
         Translate some text.
             returns result object.
+    image(query: str)
+        Image Search
+            return result object.
     """
 
     def __init__(
@@ -545,6 +548,21 @@ class Arq:
                             .keywords | .requirements | .minPyVersion | .bugTrackURL | .docsURl | .pypiURL | .releaseURl | .projectURLS
         """
         return await self._fetch("pypi", query=query)
+
+
+    async def image(self, query: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        query (str): Search query.
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
+
+                        result[result_number].title | .url
+        """
+        return await self._fetch("image", query=query)
+
 
 
 # Backwards compatibility
