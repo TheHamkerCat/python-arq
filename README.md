@@ -65,7 +65,7 @@ print(help(ARQ.deezer))
 10. Lyrics
 11. Wikipedia
 12. NSFW Image Classification
-13. Optical Character Recognition (OCR)
+13. Natural Language Processing [Spam Prediction]
 14. Proxy Scraper
 15. The Movie Database [TMDB]
 16. Quotly [TELEGRAM]

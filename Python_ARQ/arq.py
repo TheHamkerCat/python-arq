@@ -1,8 +1,7 @@
-import aiofiles
-
 from base64 import b64decode
 from re import match, sub
 
+import aiofiles
 from aiohttp import ClientSession
 from dotmap import DotMap
 from pyrogram.types import Message, User
@@ -95,8 +94,8 @@ class Arq:
         Search for something on wikipedia.
             Returns result object which you can access with dot notation.
 
-    nsfw_scan(url="https://someurl.cum/a.jpg")
-        Scan and classify an image.
+    nlp(text="hi")
+        Natural language processing.
             Returns result object which you can access with dot notation.
 
     stats()
@@ -143,24 +142,18 @@ class Arq:
             response = await resp.json()
         return DotMap(response)
 
-    async def _post(self, route, payload):
+    async def _post(self, route, params):
         async with self.session.post(
             f"{self.api_url}/{route}",
             headers={"X-API-KEY": self.api_key},
-            params={"payload": str(payload)},
+            params=params,
         ) as resp:
             if resp.status in (401, 403):
                 raise InvalidApiKey(
                     "Invalid API key, Get an api key from @ARQRobot"
                 )
             response = await resp.json()
-        if response.get("ok"):
-            response["result"] = b64decode(
-                sub("data:image/png;base64", "", response["result"])
-            )
-            return DotMap(response)
         return DotMap(response)
-
 
     async def _post_data(self, route, data):
         async with self.session.post(
@@ -174,8 +167,6 @@ class Arq:
                 )
             response = await resp.json()
         return DotMap(response)
-
-
 
     async def deezer(self, query: str, count: int = 1, format: int = 3):
         """
@@ -196,7 +187,9 @@ class Arq:
                             .artistPictures | .url
 
         """
-        return await self._fetch("deezer", query=query, count=count, format=format)
+        return await self._fetch(
+            "deezer", query=query, count=count, format=format
+        )
 
     async def torrent(self, query: str):
         """
@@ -235,7 +228,6 @@ class Arq:
 
         """
         return await self._fetch("splaylist", url=url)
-
 
     async def youtube(self, query: str):
         """
@@ -374,6 +366,18 @@ class Arq:
                         results.title | .answer
         """
         return await self._fetch("wiki", query=query)
+
+    async def nlp(self, text: str):
+        """
+        Returns An Object.
+                Parameters:
+                        text (str): Text to process.
+                Returns:
+                        Result object (str): Results which you can access with dot notation, Ex - results.data
+
+                        results.prediction | .spam | .ham
+        """
+        return await self._post("nlp", params={"text": text})
 
     async def nsfw_scan(self, url: str = None, file: str = None):
         """
@@ -516,8 +520,12 @@ class Arq:
                 for message in messages
             ],
         }
-
-        return await self._post("quotly", payload=payload)
+        response = await self._post("quotly", params={"payload": str(payload)})
+        if response.ok:
+            response.result = b64decode(
+                sub("data:image/png;base64", "", response.result)
+            )
+        return response
 
     async def translate(self, text: str, destLangCode: str = "en"):
         """
@@ -549,7 +557,6 @@ class Arq:
         """
         return await self._fetch("pypi", query=query)
 
-
     async def image(self, query: str):
         """
         Returns An Object.
@@ -562,7 +569,6 @@ class Arq:
                         result[result_number].title | .url
         """
         return await self._fetch("image", query=query)
-
 
 
 # Backwards compatibility
