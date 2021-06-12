@@ -4,6 +4,7 @@ from re import match, sub
 import aiofiles
 from aiohttp import ClientSession
 from dotmap import DotMap
+from json import dumps
 from pyrogram.types import Message, User
 
 
@@ -367,7 +368,9 @@ class Arq:
         """
         return await self._fetch("wiki", query=query)
 
-    async def nlp(self, text: str):
+    async def nlp(self, messages: list):
+        if not isinstance(messages, list):
+            messages = [messages]
         """
         Returns An Object.
                 Parameters:
@@ -377,7 +380,8 @@ class Arq:
 
                         results.prediction | .spam | .ham
         """
-        return await self._post("nlp", params={"text": text})
+        data = dumps({"messages": messages})
+        return await self._post_data("nlp", data)
 
     async def nsfw_scan(self, url: str = None, file: str = None):
         """
