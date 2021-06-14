@@ -25,11 +25,10 @@ from asyncio import run
 from aiohttp import ClientSession
 from Python_ARQ import ARQ
 
-session = ClientSession()
-arq = ARQ(api_url, api_key, session)
-
 
 async def main():
+    session = ClientSession()
+    arq = ARQ(api_url, api_key, session)
     results = await arq.deezer("Never gonna give you up", 1)
     song = results.result[0]
     title = song.title
