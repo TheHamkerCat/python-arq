@@ -8,7 +8,7 @@ Python wrapper for the A.R.Q. API.
 ## Requirements
 
 - Python 3.8 or newer.
-- API URL and KEY, from [here](https://t.me/PatheticProgrammers).
+- API URL and KEY, from [here](https://t.me/ARQRobot).
 
 ## Installation
 
