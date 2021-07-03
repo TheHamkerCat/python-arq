@@ -31,96 +31,12 @@ class Arq:
     """
     Arq class to access all the endpoints of api.
 
-    ...
 
     Parameters
     ___________
-        ARQ_API (URL: str, API_KEY: str):
-            Pass ARQ_API_BASE_URL and ARQ_API_KEY as argument
 
-    Methods
-    -------
-    deezer(query="never gonna give you up", count=1, format=3):
-        Get songs from deezer.
-            Returns result object with 'limit' number of result which you can use access dot notation.
-
-    torrent(query="tenet"):
-        Search for torrent across many websites.
-            Returns result object which you can use access dot notation.
-
-    saavn(query="attention"):
-        Get songs from Saavn.
-            Returns result object with 4-5 results which you can access with dot notation.
-
-    splaylist(url):
-        Get Saavn playlist songs.
-            Returns result object with an array of songs.
-
-    youtube(query="carry minati"):
-        Search on youtube.
-            Returns result object which you can access with dot notation.
-
-    ytdl(url="https://www.youtube.com/watch?v=IO9XlQrEt2Y"):
-        Download a youtube video.
-            Returns result object which you can access with dot notation.
-
-    wall(query="cyberpunk"):
-        Returns result object which you can access with dot notation.
-
-    reddit(subreddit="linux"):
-        Search wallpapers.
-            Returns result object with 1 result which you can access with dot notation.
-
-    urbandict(query="hoe"):
-        Search for a word on urban dictionary.
-            Returns result object which you can access with dot notation.
-
-    pornhub(query="step sis in alabama"):
-        Search pornhub videos.
-            Returns result object which you can access with dot notation.
-
-    phdl(link="https://pornhubvideolinklol.com"):
-        Download a prunhub video.
-            Returns result object with a link which you can access with dot notation
-
-    luna(query="hello luna", id=user_id):
-        Communicate with an AI chatbot.
-            Returns result object which you can access with dot notation.
-
-    lyrics(query="So Far Away Martin Garrix")
-        Search for song lyrics.
-            Returns result object which you can access with dot notation.
-
-    wiki(query="dog")
-        Search for something on wikipedia.
-            Returns result object which you can access with dot notation.
-
-    nlp(text="hi")
-        Natural language processing.
-            Returns result object which you can access with dot notation.
-
-    stats()
-        Get statistics of ARQ server.
-            Returns result object which you can access with dot notation.
-
-    proxy()
-        Generate a proxy, socks5.
-            Returns result object which you can access with dot notation.
-
-    tmdb(query: str = "", tmdbID: int = 0)
-        Search Something on TMDB
-            Returns result object which you can access with dot notation.
-
-    quotly(messages: [Message])
-        Generate stickers from telegram message.
-            Returns base64 of the image sticker.
-
-    translate(text: str, destLangCode: str = "en")
-        Translate some text.
-            returns result object.
-    image(query: str)
-        Image Search
-            return result object.
+        ARQ(API_URL: str, API_KEY: str, AioHTTPSession)
+    
     """
 
     def __init__(
@@ -574,6 +490,18 @@ class Arq:
         """
         return await self._fetch("image", query=query)
 
+    async def spellcheck(self, text: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        text (str): Some text
+                Returns:
+                        result object (str): Results which you can access with dot notation, Ex - result.correct
+
+                        result.corrected | .corrections (dict)
+        """
+        return await self._fetch("spellcheck", text=text)
 
 # Backwards compatibility
 ARQ = Arq

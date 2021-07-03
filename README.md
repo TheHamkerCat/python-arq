@@ -34,6 +34,7 @@ async def main():
     title = song.title
     link = song.url
     print(link)
+    await session.close()
 
 
 run(main())
@@ -71,6 +72,7 @@ print(help(ARQ.deezer))
 17. Translate
 18. Pypi Package Search
 19. Image Search
+20. Autocorrect (spell checker)
 
 ## Note
 
