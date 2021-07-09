@@ -1,10 +1,10 @@
 from base64 import b64decode
+from json import dumps
 from re import match, sub
 
 import aiofiles
 from aiohttp import ClientSession
 from dotmap import DotMap
-from json import dumps
 from pyrogram.types import Message, User
 
 
@@ -36,7 +36,7 @@ class Arq:
     ___________
 
         ARQ(API_URL: str, API_KEY: str, AioHTTPSession)
-    
+
     """
 
     def __init__(
@@ -75,7 +75,10 @@ class Arq:
     async def _post_data(self, route, data):
         async with self.session.post(
             f"{self.api_url}/{route}",
-            headers={"X-API-KEY": self.api_key},
+            headers={
+                "X-API-KEY": self.api_key,
+                "Content-Type": "application/json",
+            },
             data=data,
         ) as resp:
             if resp.status in (401, 403):
@@ -502,6 +505,7 @@ class Arq:
                         result.corrected | .corrections (dict)
         """
         return await self._fetch("spellcheck", text=text)
+
 
 # Backwards compatibility
 ARQ = Arq
