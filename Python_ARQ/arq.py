@@ -72,13 +72,14 @@ class Arq:
             response = await resp.json()
         return DotMap(response)
 
-    async def _post_data(self, route, data):
+    async def _post_data(self, route, data, header=None):
+        headers = {"X-API-KEY": self.api_key}
+        if header:
+            for key, value in header.items():
+                headers[key] = value
         async with self.session.post(
             f"{self.api_url}/{route}",
-            headers={
-                "X-API-KEY": self.api_key,
-                "Content-Type": "application/json",
-            },
+            headers=headers,
             data=data,
         ) as resp:
             if resp.status in (401, 403):
@@ -300,7 +301,7 @@ class Arq:
                         results.prediction | .spam | .ham
         """
         data = dumps({"messages": messages})
-        return await self._post_data("nlp", data)
+        return await self._post_data("nlp", data, {"Content-Type": "application/json"})
 
     async def nsfw_scan(self, url: str = None, file: str = None):
         """
