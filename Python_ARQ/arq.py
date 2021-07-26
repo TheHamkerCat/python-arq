@@ -89,29 +89,6 @@ class Arq:
             response = await resp.json()
         return DotMap(response)
 
-    async def deezer(self, query: str, count: int = 1, format: int = 3):
-        """
-        Returns An Object.
-
-                Parameters:
-                        query (str): Query to search
-                        count (int): Number of results to return
-                        format (int): Quality [Bitrate] of songs.
-                                      Available formats:  1 - MP3 128kbit,
-                                                          3 - MP3 320kbit,
-                                                          9 - Lossless(FLAC),
-                                      Defaults to 3, MP3 320Kbps.
-                Returns:
-                        results: Results which you can access with dot notation, Ex - results[result_number].url
-
-                        result[result_number].title | .id | .source | .duration | .thumbnail | .thumbnailBig |.artist
-                            .artistPictures | .url
-
-        """
-        return await self._fetch(
-            "deezer", query=query, count=count, format=format
-        )
-
     async def torrent(self, query: str):
         """
         Returns An Object.
@@ -507,6 +484,16 @@ class Arq:
         """
         return await self._fetch("spellcheck", text=text)
 
+    async def asq(self, question: str):
+        """
+        Returns An Object.
+
+                Parameters:
+                        question (str): A question.
+                Returns:
+                        result -> Answer
+        """
+        return await self._fetch("asq", question=question)
 
 # Backwards compatibility
 ARQ = Arq

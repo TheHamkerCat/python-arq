@@ -18,7 +18,7 @@ $ pip install python-arq
 
 ## Usage
 
-For Example, to get a song link from deezer, you can do this
+For Example, to search for a youtube video, you can do this
 
 ```py
 from asyncio import run
@@ -29,11 +29,9 @@ from Python_ARQ import ARQ
 async def main():
     session = ClientSession()
     arq = ARQ(api_url, api_key, session)
-    results = await arq.deezer("Never gonna give you up", 1)
-    song = results.result[0]
-    title = song.title
-    link = song.url
-    print(link)
+    results = await arq.youtube("Never gonna give you up")
+    videos = results.result[0]
+    print(videos)
     await session.close()
 
 
@@ -52,17 +50,16 @@ print(help(ARQ.deezer))
 
 ## Features as of now [List of APIs]
 
-1. Deezer
+1. Lyrics
 2. Jiosaavn
 3. Youtube
-4. YoutubeDL
 4. PronHub
 5. Reddit
 6. Torrent
 7. Wallpapers
 8. Urban Dictionary
 9. Luna AI Chatbot
-10. Lyrics
+10. Image Search
 11. Wikipedia
 12. NSFW Image Classification
 13. Natural Language Processing [Spam Prediction]
@@ -73,6 +70,8 @@ print(help(ARQ.deezer))
 18. Pypi Package Search
 19. Image Search
 20. Autocorrect (spell checker)
+21. YoutubeDL
+22. ASQ: Question-Answering Algorithm
 
 ## Note
 
