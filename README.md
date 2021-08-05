@@ -70,8 +70,7 @@ print(help(ARQ.deezer))
 18. Pypi Package Search
 19. Image Search
 20. Autocorrect (spell checker)
-21. YoutubeDL
-22. ASQ: Question-Answering Algorithm
+21. ASQ: Question-Answering Algorithm
 
 ## Note
 

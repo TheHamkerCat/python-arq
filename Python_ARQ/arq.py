@@ -140,19 +140,6 @@ class Arq:
         """
         return await self._fetch("youtube", query=query)
 
-    async def ytdl(self, url: str):
-        """
-        Returns An Object.
-
-                Parameters:
-                        url (str): Youtube video url
-                Returns:
-                        Result object (str): Results which you can access with dot notation, Ex - results[result_number].thumbnails
-
-                        result[result_number].id | .thumbnail | .title | .video
-        """
-        return await self._fetch("ytdl", url=url)
-
     async def wall(self, query: str):
         """
         Returns An Object.
@@ -216,17 +203,6 @@ class Arq:
             thumbsize=thumbsize,
         )
 
-    async def phdl(self, url: str):
-        """
-        Returns An Object.
-
-                Parameters:
-                        url (str): URL To Fetch
-                Returns:
-                        result object (str): Result
-        """
-        return await self._fetch("phdl", url=url)
-
     async def luna(self, query: str, id: int = 0):
         """
         Returns An Object.
@@ -278,7 +254,9 @@ class Arq:
                         results.prediction | .spam | .ham
         """
         data = dumps({"messages": messages})
-        return await self._post_data("nlp", data, {"Content-Type": "application/json"})
+        return await self._post_data(
+            "nlp", data, {"Content-Type": "application/json"}
+        )
 
     async def nsfw_scan(self, url: str = None, file: str = None):
         """
@@ -494,6 +472,7 @@ class Arq:
                         result -> Answer
         """
         return await self._fetch("asq", question=question)
+
 
 # Backwards compatibility
 ARQ = Arq
