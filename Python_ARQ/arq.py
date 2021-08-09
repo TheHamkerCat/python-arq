@@ -1,3 +1,4 @@
+from asyncio.exceptions import TimeoutError as TimeoutErr
 from base64 import b64decode
 from json import dumps
 from re import match, sub
@@ -47,29 +48,37 @@ class Arq:
         self.session = aiohttp_session
 
     async def _fetch(self, route, **params):
-        async with self.session.get(
-            f"{self.api_url}/{route}",
-            headers={"X-API-KEY": self.api_key},
-            params=params,
-        ) as resp:
-            if resp.status in (401, 403):
-                raise InvalidApiKey(
-                    "Invalid API key, Get an api key from @ARQRobot"
-                )
-            response = await resp.json()
+        try:
+            async with self.session.get(
+                f"{self.api_url}/{route}",
+                headers={"X-API-KEY": self.api_key},
+                params=params,
+                timeout=5,
+            ) as resp:
+                if resp.status in (401, 403):
+                    raise InvalidApiKey(
+                        "Invalid API key, Get an api key from @ARQRobot"
+                    )
+                response = await resp.json()
+        except TimeoutErr:
+            raise Exception("Failed to communicate with ARQ server.")
         return DotMap(response)
 
     async def _post(self, route, params):
-        async with self.session.post(
-            f"{self.api_url}/{route}",
-            headers={"X-API-KEY": self.api_key},
-            params=params,
-        ) as resp:
-            if resp.status in (401, 403):
-                raise InvalidApiKey(
-                    "Invalid API key, Get an api key from @ARQRobot"
-                )
-            response = await resp.json()
+        try:
+            async with self.session.post(
+                f"{self.api_url}/{route}",
+                headers={"X-API-KEY": self.api_key},
+                params=params,
+                timeout=10,
+            ) as resp:
+                if resp.status in (401, 403):
+                    raise InvalidApiKey(
+                        "Invalid API key, Get an api key from @ARQRobot"
+                    )
+                response = await resp.json()
+        except TimeoutErr:
+            raise Exception("Failed to communicate with ARQ server.")
         return DotMap(response)
 
     async def _post_data(self, route, data, header=None):
@@ -77,16 +86,20 @@ class Arq:
         if header:
             for key, value in header.items():
                 headers[key] = value
-        async with self.session.post(
-            f"{self.api_url}/{route}",
-            headers=headers,
-            data=data,
-        ) as resp:
-            if resp.status in (401, 403):
-                raise InvalidApiKey(
-                    "Invalid API key, Get an api key from @ARQRobot"
-                )
-            response = await resp.json()
+        try:
+            async with self.session.post(
+                f"{self.api_url}/{route}",
+                headers=headers,
+                data=data,
+                timeout=10,
+            ) as resp:
+                if resp.status in (401, 403):
+                    raise InvalidApiKey(
+                        "Invalid API key, Get an api key from @ARQRobot"
+                    )
+                response = await resp.json()
+        except TimeoutErr:
+            raise Exception("Failed to communicate with ARQ server.")
         return DotMap(response)
 
     async def torrent(self, query: str):
