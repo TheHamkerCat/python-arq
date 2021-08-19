@@ -47,13 +47,13 @@ class Arq:
         self.api_key = api_key
         self.session = aiohttp_session
 
-    async def _fetch(self, route, **params):
+    async def _fetch(self, route, timeout=15, **params):
         try:
             async with self.session.get(
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
                 params=params,
-                timeout=15,
+                timeout=timeout,
             ) as resp:
                 if resp.status in (401, 403):
                     raise InvalidApiKey(
@@ -434,13 +434,13 @@ class Arq:
             raise Exception("PROVIDE A FILE OR A URL TO UPLOAD")
 
         if not file:
-            return await self._fetch("storage/upload_url", url=url)
+            return await self._fetch("storage/upload_url", url=url, timeout=None)
 
         # Using async-generator to upload the file without
         # reading it completely in memory
         file = open(file, "rb")
         resp = await self._post_data(
-            "storage/upload_file", data={"file": file}, timeout=0
+            "storage/upload_file", data={"file": file}, timeout=None
         )
         file.close()
         return resp
