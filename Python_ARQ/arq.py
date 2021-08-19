@@ -53,7 +53,7 @@ class Arq:
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
                 params=params,
-                timeout=5,
+                timeout=15,
             ) as resp:
                 if resp.status in (401, 403):
                     raise InvalidApiKey(
@@ -70,7 +70,7 @@ class Arq:
                 f"{self.api_url}/{route}",
                 headers={"X-API-KEY": self.api_key},
                 params=params,
-                timeout=10,
+                timeout=15,
             ) as resp:
                 if resp.status in (401, 403):
                     raise InvalidApiKey(
@@ -81,7 +81,7 @@ class Arq:
             raise Exception("Failed to communicate with ARQ server.")
         return DotMap(response)
 
-    async def _post_data(self, route, data, header=None):
+    async def _post_data(self, route, data, header=None, timeout=15):
         headers = {"X-API-KEY": self.api_key}
         if header:
             for key, value in header.items():
@@ -91,7 +91,7 @@ class Arq:
                 f"{self.api_url}/{route}",
                 headers=headers,
                 data=data,
-                timeout=10,
+                timeout=timeout,
             ) as resp:
                 if resp.status in (401, 403):
                     raise InvalidApiKey(
@@ -419,6 +419,32 @@ class Arq:
             )
         return response
 
+    async def upload(self, file: str = None, url: str = None):
+        """
+        NOTE: MAXIMUM SUPPORTED FILE SIZE IS 100MB
+
+        Returns An Object.
+                Parameters:
+                        file (str)[OPTIONAL]: Path of the file you want to upload.
+                        url (str)[OPTIONAL]: URL of the file you want to upload.
+                Returns:
+                        response.result (link)
+        """
+        if not file and not url:
+            raise Exception("PROVIDE A FILE OR A URL TO UPLOAD")
+
+        if not file:
+            return await self._fetch("storage/upload_url", url=url)
+
+        # Using async-generator to upload the file without
+        # reading it completely in memory
+        file = open(file, "rb")
+        resp = await self._post_data(
+            "storage/upload_file", data={"file": file}, timeout=0
+        )
+        file.close()
+        return resp
+
     async def translate(self, text: str, destLangCode: str = "en"):
         """
         Returns An Object.
@@ -485,6 +511,40 @@ class Arq:
                         result -> Answer
         """
         return await self._fetch("asq", question=question)
+
+    async def execute(
+        self,
+        language: str = None,
+        code: str = None,
+        stdin: str = "",
+        args: list = [],
+    ):
+        """
+        Returns An Object.
+                Parameters:
+                    language (str)[optional]: Programming language.
+                    code (str)[optional]: Code to execute.
+                    stdin (str)[optional]: STDIN for the code.
+                    args (list)[optional]: arguments to pass in cli.
+                Returns:
+                    Result object:
+                        result.stdout, result.stdout `if language is passed`,
+                        else a list of supported languages is returned
+        """
+        if not language:
+            return await self._fetch("get_languages")
+
+        data = dumps(
+            dict(
+                language=language,
+                code=code,
+                stdin=stdin,
+                args=args,
+            )
+        )
+        return await self._post_data(
+            "execute", data, {"Content-Type": "application/json"}
+        )
 
 
 # Backwards compatibility

@@ -71,6 +71,8 @@ print(help(ARQ.deezer))
 19. Image Search
 20. Autocorrect (spell checker)
 21. ASQ: Question-Answering Algorithm
+22. Container code execution via piston
+23. ARQ Storage, Unlimited file storage (100MB/file)
 
 ## Note
 
