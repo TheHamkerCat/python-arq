@@ -51,9 +51,9 @@ print(help(ARQ.deezer))
 ## Features as of now [List of APIs]
 
 1. Lyrics
-2. Jiosaavn
+2. Google Translate
 3. Youtube
-4. PronHub
+4. Container code execution via piston
 5. Reddit
 6. Torrent
 7. Wallpapers
@@ -66,13 +66,12 @@ print(help(ARQ.deezer))
 14. Proxy Scraper
 15. The Movie Database [TMDB]
 16. Quotly [TELEGRAM]
-17. Translate
+17. Jiosaavn
 18. Pypi Package Search
 19. Image Search
 20. Autocorrect (spell checker)
 21. ASQ: Question-Answering Algorithm
-22. Container code execution via piston
-23. ARQ Storage, Unlimited file storage (100MB/file)
+22. ARQ Storage, Unlimited file storage (100MB/file)
 
 ## Note
 
