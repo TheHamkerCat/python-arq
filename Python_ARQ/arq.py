@@ -235,9 +235,9 @@ class Arq:
                 Parameters:
                         query (str): Query to search
                 Returns:
-                        Result object (str): Results which you can access with dot notation, Ex - results.lyrics
+                        Result object (str): list of results which you can access with dot notation, Ex - results[0].lyrics
 
-                        results.lyrics
+                        results[0].song | results[0].artist | results[0].lyrics
         """
         return await self._fetch("lyrics", query=query)
 
