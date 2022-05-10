@@ -24,6 +24,10 @@ class InvalidApiKey(Exception):
     pass
 
 
+class RateLimitExceeded(Exception):
+    pass
+
+
 class GenericApiError(Exception):
     pass
 
@@ -58,6 +62,10 @@ class Arq:
                 if resp.status in (401, 403):
                     raise InvalidApiKey(
                         "Invalid API key, Get an api key from @ARQRobot"
+                    )
+                elif resp.status == 429:
+                    raise RateLimitExceeded(
+                        "Rate limit exceeded, https://t.me/ARQupdates/95"
                     )
                 response = await resp.json()
         except TimeoutErr:
@@ -418,32 +426,6 @@ class Arq:
                 sub("data:image/png;base64", "", response.result)
             )
         return response
-
-    async def upload(self, file: str = None, url: str = None):
-        """
-        NOTE: MAXIMUM SUPPORTED FILE SIZE IS 100MB
-
-        Returns An Object.
-                Parameters:
-                        file (str)[OPTIONAL]: Path of the file you want to upload.
-                        url (str)[OPTIONAL]: URL of the file you want to upload.
-                Returns:
-                        response.result (link)
-        """
-        if not file and not url:
-            raise Exception("PROVIDE A FILE OR A URL TO UPLOAD")
-
-        if not file:
-            return await self._fetch("storage/upload_url", url=url, timeout=None)
-
-        # Using async-generator to upload the file without
-        # reading it completely in memory
-        file = open(file, "rb")
-        resp = await self._post_data(
-            "storage/upload_file", data={"file": file}, timeout=None
-        )
-        file.close()
-        return resp
 
     async def translate(self, text: str, destLangCode: str = "en"):
         """
