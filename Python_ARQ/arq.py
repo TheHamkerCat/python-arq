@@ -2,6 +2,7 @@ from asyncio.exceptions import TimeoutError as TimeoutErr
 from base64 import b64decode
 from json import dumps
 from re import match, sub
+from typing import List
 
 import aiofiles
 from aiohttp import ClientSession
@@ -44,9 +45,7 @@ class Arq:
 
     """
 
-    def __init__(
-        self, api_url: str, api_key: str, aiohttp_session: ClientSession
-    ):
+    def __init__(self, api_url: str, api_key: str, aiohttp_session: ClientSession):
         self.api_url = _format_url(api_url.strip(" /"))
         self.api_key = api_key
         self.session = aiohttp_session
@@ -200,9 +199,7 @@ class Arq:
         """
         return await self._fetch("ud", query=query)
 
-    async def pornhub(
-        self, query: str = "", page: int = 1, thumbsize: str = "small"
-    ):
+    async def pornhub(self, query: str = "", page: int = 1, thumbsize: str = "small"):
         """
         Returns An Object.
 
@@ -275,9 +272,7 @@ class Arq:
                         results.prediction | .spam | .ham
         """
         data = dumps({"messages": messages})
-        return await self._post_data(
-            "nlp", data, {"Content-Type": "application/json"}
-        )
+        return await self._post_data("nlp", data, {"Content-Type": "application/json"})
 
     async def nsfw_scan(self, url: str = None, file: str = None):
         """
@@ -335,7 +330,7 @@ class Arq:
         """
         return await self._fetch("tmdb", query=query, tmdbID=tmdbID)
 
-    async def quotly(self, messages: [Message]):
+    async def quotly(self, messages: List[Message]):
         """
         Returns An Object.
 
@@ -349,73 +344,90 @@ class Arq:
         if not isinstance(messages, list):
             messages = [messages]
 
+        def typeToStr(pyrogrma_type):
+            return str(pyrogrma_type).split(".")[-1].loower()
+
         payload = {
             "type": "quote",
             "format": "png",
             "backgroundColor": "#1b1429",
             "messages": [
                 {
-                    "entities": [
-                        {
-                            "type": entity.type,
-                            "offset": entity.offset,
-                            "length": entity.length,
-                        }
-                        for entity in message.entities
-                    ]
-                    if message.entities
-                    else [],
-                    "chatId": message.forward_from.id
-                    if message.forward_from
-                    else message.from_user.id,
+                    "entities": (
+                        [
+                            {
+                                "type": typeToStr(entity.type),
+                                "offset": entity.offset,
+                                "length": entity.length,
+                            }
+                            for entity in message.entities
+                        ]
+                        if message.entities
+                        else []
+                    ),
+                    "chatId": (
+                        message.forward_from.id
+                        if message.forward_from
+                        else message.from_user.id
+                    ),
                     "avatar": True,
-                    "from": {
-                        "id": message.from_user.id,
-                        "username": message.from_user.username
-                        if message.from_user.username
-                        else "",
-                        "photo": {
-                            "small_file_id": message.from_user.photo.small_file_id,
-                            "small_photo_unique_id": message.from_user.photo.small_photo_unique_id,
-                            "big_file_id": message.from_user.photo.big_file_id,
-                            "big_photo_unique_id": message.from_user.photo.big_photo_unique_id,
+                    "from": (
+                        {
+                            "id": message.from_user.id,
+                            "username": (
+                                message.from_user.username
+                                if message.from_user.username
+                                else ""
+                            ),
+                            "photo": (
+                                {
+                                    "small_file_id": message.from_user.photo.small_file_id,
+                                    "small_photo_unique_id": message.from_user.photo.small_photo_unique_id,
+                                    "big_file_id": message.from_user.photo.big_file_id,
+                                    "big_photo_unique_id": message.from_user.photo.big_photo_unique_id,
+                                }
+                                if message.from_user.photo
+                                else ""
+                            ),
+                            "type": typeToStr(message.chat.type),
+                            "name": _get_name(message.from_user),
                         }
-                        if message.from_user.photo
-                        else "",
-                        "type": message.chat.type,
-                        "name": _get_name(message.from_user),
-                    }
-                    if not message.forward_from
-                    else {
-                        "id": message.forward_from.id,
-                        "username": message.forward_from.username
-                        if message.forward_from.username
-                        else "",
-                        "photo": {
-                            "small_file_id": message.forward_from.photo.small_file_id,
-                            "small_photo_unique_id": message.forward_from.photo.small_photo_unique_id,
-                            "big_file_id": message.forward_from.photo.big_file_id,
-                            "big_photo_unique_id": message.forward_from.photo.big_photo_unique_id,
+                        if not message.forward_from
+                        else {
+                            "id": message.forward_from.id,
+                            "username": (
+                                message.forward_from.username
+                                if message.forward_from.username
+                                else ""
+                            ),
+                            "photo": (
+                                {
+                                    "small_file_id": message.forward_from.photo.small_file_id,
+                                    "small_photo_unique_id": message.forward_from.photo.small_photo_unique_id,
+                                    "big_file_id": message.forward_from.photo.big_file_id,
+                                    "big_photo_unique_id": message.forward_from.photo.big_photo_unique_id,
+                                }
+                                if message.forward_from.photo
+                                else ""
+                            ),
+                            "type": typeToStr(message.chat.type),
+                            "name": _get_name(message.forward_from),
                         }
-                        if message.forward_from.photo
-                        else "",
-                        "type": message.chat.type,
-                        "name": _get_name(message.forward_from),
-                    },
+                    ),
                     "text": message.text if message.text else "",
                     "replyMessage": (
-                        {
-                            "name": _get_name(
-                                message.reply_to_message.from_user
-                            ),
-                            "text": message.reply_to_message.text,
-                            "chatId": message.reply_to_message.from_user.id,
-                        }
-                        if message.reply_to_message
+                        (
+                            {
+                                "name": _get_name(message.reply_to_message.from_user),
+                                "text": message.reply_to_message.text,
+                                "chatId": message.reply_to_message.from_user.id,
+                            }
+                            if message.reply_to_message
+                            else {}
+                        )
+                        if len(messages) == 1
                         else {}
-                    )
-                    if len(messages) == 1
-                    else {},
+                    ),
                 }
                 for message in messages
             ],
@@ -439,9 +451,7 @@ class Arq:
 
                         result[result_number].text | .src | .dest
         """
-        return await self._fetch(
-            "translate", text=text, destLangCode=destLangCode
-        )
+        return await self._fetch("translate", text=text, destLangCode=destLangCode)
 
     async def pypi(self, query: str):
         """
