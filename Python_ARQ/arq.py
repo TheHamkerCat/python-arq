@@ -344,8 +344,8 @@ class Arq:
         if not isinstance(messages, list):
             messages = [messages]
 
-        def typeToStr(pyrogrma_type):
-            return str(pyrogrma_type).split(".")[-1].loower()
+        def typeToStr(pyrogram_type):
+            return str(pyrogram_type).split(".")[-1].lower()
 
         payload = {
             "type": "quote",
